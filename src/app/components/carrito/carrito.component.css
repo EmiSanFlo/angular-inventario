@@ -1,0 +1,111 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+/* Estilos generales */
+body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    padding: 20px;
+}
+
+/* Estilo para el carrito */
+h2 {
+    color: #4f4f4f;
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Contenedor del carrito */
+div {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para los productos */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Ajusta el espacio entre los botones */
+    align-items: center;
+}
+
+.btn {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 20px;    
+    cursor: pointer;
+    width: 120px; /* Ajusta el ancho de los botones */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    box-sizing: border-box; /* Asegura que el padding se incluya en el tamaño total del botón */
+    border-radius: 5px; /* Añade bordes redondeados */
+    transition: background-color 0.3s, transform 0.3s; /* Añade una transición suave */
+}
+
+.btn:hover {
+    background-color: darkgray;
+    transform: scale(1.05); /* Añade un efecto de escala al pasar el ratón */
+
+}
+
+button:active {
+    background-color: #111;
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Estilo para el mensaje cuando el carrito está vacío */
+p {
+    color: #888;
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
+/* Estilo para el botón de "Recibo" */
+button[type="button"]:last-of-type {
+    background-color: #000000;
+    color: white;
+    font-size: 1.1em;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button[type="button"]:last-of-type:hover {
+    background-color: #000000;
+    transform: scale(1.05);
+}

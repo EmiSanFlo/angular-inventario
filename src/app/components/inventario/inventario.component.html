@@ -1,0 +1,39 @@
+<h1>Inventario</h1>
+
+<div>
+  <h2>Agregar Producto</h2>
+  <input [(ngModel)]="nuevoProducto.id" placeholder="ID" type="number" />
+  <input [(ngModel)]="nuevoProducto.nombre" placeholder="Nombre" />
+  <input [(ngModel)]="nuevoProducto.cantidad" placeholder="Cantidad" type="number" />
+  <input [(ngModel)]="nuevoProducto.precio" placeholder="Precio" type="number" />
+  <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+  <button (click)="crearProducto()">Agregar</button>
+</div>
+
+<!-- Lista de productos -->
+<div>
+  <h2>Lista de Productos</h2>
+  <ul>
+    <li *ngFor="let producto of productos">
+      <img [src]="producto.imagen" alt="{{ producto.nombre }}" width="50" height="50" />
+      <span>{{ producto.nombre }} (ID: {{ producto.id }}) - Cantidad: {{ producto.cantidad }}, Precio: {{ producto.precio }}</span>
+      <button (click)="modificarProducto(producto.id)">Modificar</button>
+      <button (click)="eliminarProducto(producto.id)">Eliminar</button>
+    </li>
+  </ul>
+</div>
+
+<!-- Botón para generar XML -->
+<div>
+  <button (click)="generarXML()">Generar y Descargar XML</button>
+</div>
+
+<!-- Botón para regresar al catálogo -->
+<div>
+  <button (click)="irAlCatalogo()">Regresar al Catálogo</button>
+</div>
+
+<div>
+  <input type="file" (change)="cargarCatalogoDesdeXML($event)" accept=".xml" />
+  <button (click)="cargarCatalogoDesdeXML($event)">Cargar Catálogo desde XML</button>
+</div>

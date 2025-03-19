@@ -1,0 +1,86 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+}
+
+.productos {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+}
+
+.producto {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    text-align: center;
+    width: 220px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.producto:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.producto img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.producto h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.producto p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+button {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+button:hover {
+    background-color: #333;
+    transform: scale(1.05);
+}
+
+button:active {
+    background-color: #111;
+}
+
+button:focus {
+    outline: none;
+}
+
+button:last-of-type {
+    margin-top: 20px;
+    background-color: #535353;
+    width: 100%;
+}
+
+button:last-of-type:hover {
+    background-color: #000000;
+}
