@@ -1,12 +1,22 @@
-<H2>Catalogo de Productos</H2>
+<nav class="navbar">
+    <div>
+        <h1>Catalogo de Productos</h1>    
+    </div>
+    <div class="navbar-buttons">
+        <div>
+        <button (click)="irAlInventario()">Ir al Inventario</button>
+        </div>
+        <div>
+        <button (click)="irAlCarrito()">Ir al Carrito</button>
+        </div>
+    </div>
+</nav>
+
 <div class="productos">
-    <div *ngFor = "let producto of productos" class="producto">
+    <div *ngFor="let producto of productos" class="producto">
         <img [src]="producto.imagen">
         <h3>{{ producto.nombre }}</h3>
-        <p>Cantidad: {{ producto.cantidad }}</p>
-        <p>Precio:${{ producto.precio }}</p>
+        <p>Precio: ${{ producto.precio }}</p>
         <button (click)="agregarAlCarrito(producto)">Agregar al Carrito</button>
     </div>
 </div>
-<button (click)="irAlCarrito()">Ir al Carrito</button>
-<button (click)="irAlInventario()">Ir al Inventario</button>
