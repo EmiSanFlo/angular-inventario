@@ -1,3 +1,4 @@
+
 <div class="container">
     <h2>Carrito de compra</h2>
     <div *ngIf="carrito.length > 0">
@@ -11,7 +12,10 @@
                 </div>
             </li>
         </ul>
+        <div id="paypal-button-container"></div>
         <button type="button" (click)="generarXML()">Descargar Recibo</button>
     </div>
     <p *ngIf="carrito.length === 0">El carrito está vacío</p>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=ARbAyq0vx3C2eyiZuvUmTRQZEZutl_-t9HsDjsn87MexI9It4CEQPGLcVcQd_E2aV8b6xbJ8u5e7RIfI&currency=USD"></script>
 </div>
