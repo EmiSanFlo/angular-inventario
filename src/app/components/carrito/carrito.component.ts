@@ -36,8 +36,7 @@ export class CarritoComponent implements OnInit{
         const script = document.createElement('script');
         //en client-id pegar el id que les sale en paypal developers. Se meten a dashboard y donde dice credenciales
         //en carrito.component.html tambien cambien el client-id
-        script.src = 'https://www.paypal.com/sdk/js?client-id=ARbAyq0vx3C2eyiZuvUmTRQZEZutl_-t9HsDjsn87MexI9It4CEQPGLcVcQd_E2aV8b6xbJ8u5e7RIfI&currency=USD';
-        script.onload = () => resolve();
+script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WLj9X45Pr0WINWqxxC-9uALPkl67r1xUQgga31y7-S_-HOA0Gj7vFFX3&currency=MXN';        script.onload = () => resolve();
         script.onerror = () => reject('No se pudo cargar el SDK de PayPal');
         document.body.appendChild(script);
       });
