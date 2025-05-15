@@ -27,8 +27,8 @@ export class CarritoService {
         // Productos en el carrito
         xmlContent += `  <productos>\n`;
         this.carrito.forEach((producto) => {
-            const subtotal = producto.precio * producto.cantidad;
-            xmlContent += `    <producto>\n      <id>${producto.id}</id>\n      <descripcion>${producto.nombre}</descripcion>\n      <cantidad>${producto.cantidad}</cantidad>\n      <precioUnitario>${producto.precio}</precioUnitario>\n      <subtotal>${subtotal}</subtotal>\n    </producto>\n`;
+            const subtotal = producto.Precio * producto.StockDisponible;
+            xmlContent += `    <producto>\n      <id>${producto.Id}</id>\n      <descripcion>${producto.Nombre}</descripcion>\n      <cantidad>${producto.StockDisponible}</cantidad>\n      <precioUnitario>${producto.Precio}</precioUnitario>\n      <subtotal>${subtotal}</subtotal>\n    </producto>\n`;
         });
         xmlContent += `  </productos>\n`;
 
@@ -55,6 +55,6 @@ export class CarritoService {
 
     // Método para calcular el subtotal
     calcularSubtotal(): number {
-        return this.carrito.reduce((total, producto) => total + (producto.precio * producto.cantidad), 0);
+        return this.carrito.reduce((total, producto) => total + (producto.Precio * producto.StockDisponible), 0);
     }
 }

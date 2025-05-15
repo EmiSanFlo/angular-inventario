@@ -24,11 +24,11 @@ export class ProductoService {
     for (let i = 0; i < productosXML.length; i++) {
       const productoXML = productosXML[i];
       const producto: Producto = {
-        id: +productoXML.getElementsByTagName('id')[0].textContent!,
-        nombre: productoXML.getElementsByTagName('nombre')[0].textContent!,
-        cantidad: +productoXML.getElementsByTagName('cantidad')[0].textContent!,
-        precio: +productoXML.getElementsByTagName('precio')[0].textContent!,
-        imagen: productoXML.getElementsByTagName('imagen')[0].textContent!,
+        Id: +productoXML.getElementsByTagName('id')[0].textContent!,
+        Nombre: productoXML.getElementsByTagName('nombre')[0].textContent!,
+        StockDisponible: +productoXML.getElementsByTagName('cantidad')[0].textContent!,
+        Precio: +productoXML.getElementsByTagName('precio')[0].textContent!,
+        ImagenPrincipal: productoXML.getElementsByTagName('imagen')[0].textContent!,
       };
       this.productos.push(producto);
     }
@@ -45,7 +45,7 @@ export class ProductoService {
   }
 
   modificarProducto(id: number, nuevoProducto: Producto): void {
-    const index = this.productos.findIndex((p) => p.id === id);
+    const index = this.productos.findIndex((p) => p.Id === id);
     if (index !== -1) {
       this.productos[index] = { ...this.productos[index], ...nuevoProducto };
       this.productosSubject.next([...this.productos]); // Notificar el cambio
@@ -53,7 +53,7 @@ export class ProductoService {
   }
 
   eliminarProducto(id: number): void {
-    this.productos = this.productos.filter((p) => p.id !== id);
+    this.productos = this.productos.filter((p) => p.Id !== id);
     this.productosSubject.next([...this.productos]); // Notificar el cambio
   }
 
@@ -63,11 +63,11 @@ export class ProductoService {
   
     this.productos.forEach((producto) => {
       xmlContent += '  <producto>\n';
-      xmlContent += `    <id>${producto.id}</id>\n`;
-      xmlContent += `    <nombre>${producto.nombre}</nombre>\n`;
-      xmlContent += `    <cantidad>${producto.cantidad}</cantidad>\n`;
-      xmlContent += `    <precio>${producto.precio}</precio>\n`;
-      xmlContent += `    <imagen>${producto.imagen}</imagen>\n`;
+      xmlContent += `    <id>${producto.Id}</id>\n`;
+      xmlContent += `    <nombre>${producto.Nombre}</nombre>\n`;
+      xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
+      xmlContent += `    <precio>${producto.Precio}</precio>\n`;
+      xmlContent += `    <imagen>${producto.ImagenPrincipal}</imagen>\n`;
       xmlContent += '  </producto>\n';
     });
   

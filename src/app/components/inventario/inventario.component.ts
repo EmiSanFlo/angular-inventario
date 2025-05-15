@@ -14,7 +14,7 @@ import { ProductoService } from '../../services/producto.service'; // Usar Produ
   styleUrls: ['./inventario.components.css'],
 })
 export class InventarioComponent {
-  nuevoProducto: Producto = { id: 0, nombre: '', cantidad: 0, precio: 0, imagen: '' };
+  nuevoProducto: Producto = { Id: 0, Nombre: '', StockDisponible: 0, Precio: 0, ImagenPrincipal: '' };
   productos: Producto[] = [];
 
   constructor(private productoService: ProductoService, private inventarioService: InventarioService, private router: Router) {
@@ -25,22 +25,22 @@ export class InventarioComponent {
     this.inventarioService.crearProducto(this.nuevoProducto);
     this.productoService.agregarProducto(this.nuevoProducto);
     this.actualizarLista();
-    this.nuevoProducto = { id: 0, nombre: '', cantidad: 0, precio: 0, imagen: '' }; // Reiniciar el formulario
+    this.nuevoProducto = { Id: 0, Nombre: '', StockDisponible: 0, Precio: 0, ImagenPrincipal: '' }; // Reiniciar el formulario
   }
 
   modificarProducto(id: number): void {
-    const producto = this.productos.find((p) => p.id === id);
+    const producto = this.productos.find((p) => p.Id === id);
     if (producto) {
-      const nuevoNombre = prompt('Ingrese el nuevo nombre:', producto.nombre);
-      const nuevaCantidad = prompt('Ingrese la nueva cantidad:', producto.cantidad.toString());
-      const nuevoPrecio = prompt('Ingrese el nuevo precio:', producto.precio.toString());
+      const nuevoNombre = prompt('Ingrese el nuevo nombre:', producto.Nombre);
+      const nuevaCantidad = prompt('Ingrese la nueva cantidad:', producto.StockDisponible.toString());
+      const nuevoPrecio = prompt('Ingrese el nuevo precio:', producto.Precio.toString());
 
       if (nuevoNombre && nuevaCantidad && nuevoPrecio) {
         const productoModificado: Producto = {
           ...producto,
-          nombre: nuevoNombre,
-          cantidad: +nuevaCantidad,
-          precio: +nuevoPrecio,
+          Nombre: nuevoNombre,
+          StockDisponible: +nuevaCantidad,
+          Precio: +nuevoPrecio,
         };
         this.productoService.modificarProducto(id, productoModificado); // Llamar al método del servicio
         this.actualizarLista(); // Actualizar la lista después de modificar
@@ -72,17 +72,28 @@ export class InventarioComponent {
   }
 
   cargarCatalogoDesdeXML(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const xmlContent = reader.result as string;
-        this.productoService.cargarCatalogoDesdeXML(xmlContent); // Llamar al método del servicio
-        this.actualizarLista(); // Actualizar la lista después de cargar el catálogo
-      };
-      reader.readAsText(file);
-    }
+  const file: File = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const xmlContent = reader.result as string;
+      this.productoService.cargarCatalogoDesdeXML(xmlContent); // Llama al método del servicio
+      this.actualizarLista(); // Actualiza la lista después de cargar el catálogo
+
+      // Envía los productos al backend
+      const productos = this.productoService.obtenerProductos(); // Obtén el arreglo de productos
+      fetch('http://localhost:3000/productos/importar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productos)
+      })
+      .then(res => res.text())
+      .then(msg => alert(msg))
+      .catch(err => alert('Error al importar productos'));
+    };
+    reader.readAsText(file);
   }
+}
 
   generarXML(): void {
     let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -90,11 +101,11 @@ export class InventarioComponent {
 
     this.productos.forEach((producto) => {
       xmlContent += '  <producto>\n';
-      xmlContent += `    <id>${producto.id}</id>\n`;
-      xmlContent += `    <nombre>${producto.nombre}</nombre>\n`;
-      xmlContent += `    <cantidad>${producto.cantidad}</cantidad>\n`;
-      xmlContent += `    <precio>${producto.precio}</precio>\n`;
-      xmlContent += `    <imagen>${producto.imagen}</imagen>\n`;
+      xmlContent += `    <id>${producto.Id}</id>\n`;
+      xmlContent += `    <nombre>${producto.Nombre}</nombre>\n`;
+      xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
+      xmlContent += `    <precio>${producto.Precio}</precio>\n`;
+      xmlContent += `    <imagen>${producto.ImagenPrincipal}</imagen>\n`;
       xmlContent += '  </producto>\n';
     });
 
@@ -113,7 +124,7 @@ export class InventarioComponent {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        this.nuevoProducto.imagen = reader.result as string; // Guardar la imagen como URL
+        this.nuevoProducto.ImagenPrincipal = reader.result as string; // Guardar la imagen como URL
       };
       reader.readAsDataURL(file);
     }

@@ -43,7 +43,7 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
     }
 
     getTotal(): number {
-      return this.carrito.reduce((total, producto) => total + producto.precio * producto.cantidad, 0);
+      return this.carrito.reduce((total, producto) => total + producto.Precio * producto.StockDisponible, 0);
     }
   
     initPayPalButton(): void {
@@ -71,8 +71,8 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
     }
 
     eliminarProducto(index: number): void{
-      this.carrito[index].cantidad -= 1;
-      if(this.carrito[index].cantidad === 0){
+      this.carrito[index].StockDisponible -= 1;
+      if(this.carrito[index].StockDisponible === 0){
         this.carrito.splice(index, 1);
       }
     }
@@ -90,15 +90,15 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
     }
   
     agregarOtro(index: number) {
-      this.carrito[index].cantidad += 1;
+      this.carrito[index].StockDisponible += 1;
     }
 
     agregarProducto(producto: Producto) {
-      const index = this.carrito.findIndex(p => p.nombre === producto.nombre);
+      const index = this.carrito.findIndex(p => p.Nombre === producto.Nombre);
       if (index !== -1) {
-        this.carrito[index].cantidad += 1;
+        this.carrito[index].StockDisponible += 1;
       } else {
-        this.carrito.push({ ...producto, cantidad: 1 });
+        this.carrito.push({ ...producto, StockDisponible: 1 });
       }
     }
 }

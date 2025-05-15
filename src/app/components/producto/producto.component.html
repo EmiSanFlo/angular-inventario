@@ -14,9 +14,10 @@
 
 <div class="productos">
     <div *ngFor="let producto of productos" class="producto">
-        <img [src]="producto.imagen">
-        <h3>{{ producto.nombre }}</h3>
-        <p>Precio: ${{ producto.precio }}</p>
+        <img [src]="producto.ImagenPrincipal">
+        <h3>{{ producto.Nombre }}</h3>
+        <p>Precio: ${{ producto.Precio }}</p>
+        <p>{{ producto.StockDisponible }} unidades</p>
         <button (click)="agregarAlCarrito(producto)">Agregar al Carrito</button>
     </div>
 </div>

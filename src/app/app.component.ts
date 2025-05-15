@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ProductosService } from './servicios/productos.service';
 import { RouterModule } from '@angular/router';
 import { ProductoComponent } from './components/producto/producto.component';
 
@@ -11,6 +12,17 @@ import { ProductoComponent } from './components/producto/producto.component';
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent {
-  title = 'mi-proyecto';
+export class AppComponent implements OnInit {
+  productos: any[] = [];
+
+  ngOnInit() {
+    fetch('http://localhost:3000/productos')
+      .then(response => response.json())
+      .then(data => {
+        this.productos = data;
+      })
+      .catch(error => {
+        console.error('Error al obtener productos:', error);
+      });
+  }
 }

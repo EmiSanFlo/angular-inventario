@@ -14,14 +14,14 @@ export class InventarioService {
   }
 
   modificarProducto(id: number, nuevoProducto: Producto): void {
-    const index = this.inventario.findIndex((p) => p.id === id);
+    const index = this.inventario.findIndex((p) => p.Id === id);
     if (index !== -1) {
       this.inventario[index] = { ...this.inventario[index], ...nuevoProducto };
     }
   }
 
   eliminarProducto(id: number): void {
-    this.inventario = this.inventario.filter((p) => p.id !== id);
+    this.inventario = this.inventario.filter((p) => p.Id !== id);
   }
 
   consultarInventario(): Producto[] {
@@ -34,11 +34,11 @@ export class InventarioService {
 
     this.inventario.forEach((producto) => {
       xmlContent += '  <producto>\n';
-      xmlContent += `    <id>${producto.id}</id>\n`;
-      xmlContent += `    <nombre>${producto.nombre}</nombre>\n`;
-      xmlContent += `    <cantidad>${producto.cantidad}</cantidad>\n`;
-      xmlContent += `    <precio>${producto.precio}</precio>\n`;
-      xmlContent += `    <imagen>${producto.imagen}</imagen>\n`; // Incluir la imagen
+      xmlContent += `    <id>${producto.Id}</id>\n`;
+      xmlContent += `    <nombre>${producto.Nombre}</nombre>\n`;
+      xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
+      xmlContent += `    <precio>${producto.Precio}</precio>\n`;
+      xmlContent += `    <imagen>${producto.ImagenPrincipal}</imagen>\n`; // Incluir la imagen
       xmlContent += '  </producto>\n';
     });
 
