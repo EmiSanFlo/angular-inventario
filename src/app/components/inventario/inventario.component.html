@@ -3,7 +3,6 @@
       <!-- Contenido de la sección izquierda (Agregar Producto, etc.) -->
       <h2>Agregar Producto</h2>
       <!-- ...otros elementos... -->
-      <input [(ngModel)]="nuevoProducto.Id" placeholder="ID" type="number" />
       <input [(ngModel)]="nuevoProducto.Nombre" placeholder="Nombre" />
       <input [(ngModel)]="nuevoProducto.StockDisponible" placeholder="Cantidad" type="number" />
       <input [(ngModel)]="nuevoProducto.Precio" placeholder="Precio" type="number" />
@@ -26,13 +25,13 @@
       <h2>Lista de Productos</h2>
       <!-- ...otros elementos... -->
       <ul>
-        <li *ngFor="let producto of productos">
-          <img [src]="producto.ImagenPrincipal" alt="{{ producto.Nombre }}" width="50" height="50" />
-          <span>{{ producto.Nombre }} (ID: {{ producto.Id }}) - Cantidad: {{ producto.StockDisponible }}, Precio: {{ producto.Precio }}</span>
-          <button (click)="modificarProducto(producto.Id)">Modificar</button>
-          <button (click)="eliminarProducto(producto.Id)">Eliminar</button>
-        </li>
-      </ul>
+  <li *ngFor="let producto of productos">
+    <img [src]="producto.ImagenPrincipal" alt="{{ producto.Nombre }}" width="50" height="50" />
+    <span>{{ producto.Nombre }} (ID: {{ producto.Id }}) - Cantidad: {{ producto.StockDisponible }}, Precio: {{ producto.Precio }}</span>
+    <button (click)="modificarProducto(producto)">Modificar</button>
+    <button (click)="eliminarProducto(producto.Id)">Eliminar</button>
+  </li>
+</ul>
       <button (click)="generarXML()">Generar y Descargar XML</button>
   </div>
 </div>

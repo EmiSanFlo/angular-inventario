@@ -77,6 +77,38 @@ app.post('/productos/importar', (req, res) => {
     });
 });
 
+// Crear producto
+app.post('/productos', (req, res) => {
+    const { Nombre, Precio, StockDisponible, ImagenPrincipal } = req.body;
+    const query = 'INSERT INTO producto (Nombre, Precio, StockDisponible, ImagenPrincipal) VALUES (?, ?, ?, ?)';
+    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal], (err, result) => {
+        if (err) return res.status(500).send('Error al agregar producto');
+        res.send('Producto agregado');
+    });
+});
+
+// Modificar producto
+app.delete('/productos/:id', (req, res) => {
+    const id = Number(req.params.id); // <-- fuerza a número
+    const query = 'DELETE FROM producto WHERE Id=?';
+    db.query(query, [id], (err, result) => {
+        if (err) return res.status(500).send('Error al eliminar producto');
+        if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
+        res.send('Producto eliminado');
+    });
+});
+
+app.put('/productos/:id', (req, res) => {
+    const id = Number(req.params.id); // <-- fuerza a número
+    const { Nombre, Precio, StockDisponible, ImagenPrincipal } = req.body;
+    const query = 'UPDATE producto SET Nombre=?, Precio=?, StockDisponible=?, ImagenPrincipal=? WHERE Id=?';
+    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, id], (err, result) => {
+        if (err) return res.status(500).send('Error al modificar producto');
+        if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
+        res.send('Producto modificado');
+    });
+});
+
 // Iniciar el servidor
 const PORT = 3000;
 app.listen(PORT, () => {

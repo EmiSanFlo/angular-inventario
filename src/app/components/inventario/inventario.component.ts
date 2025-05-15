@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router'; // Importar Router
 import { CommonModule } from '@angular/common'; // Importar CommonModule
 import { FormsModule } from '@angular/forms';
@@ -21,43 +21,60 @@ export class InventarioComponent {
     this.actualizarLista();
   }
 
-  crearProducto(): void {
-    this.inventarioService.crearProducto(this.nuevoProducto);
-    this.productoService.agregarProducto(this.nuevoProducto);
-    this.actualizarLista();
-    this.nuevoProducto = { Id: 0, Nombre: '', StockDisponible: 0, Precio: 0, ImagenPrincipal: '' }; // Reiniciar el formulario
+  ngOnInit() {
+    this.cargarProductos();
   }
 
-  modificarProducto(id: number): void {
-    const producto = this.productos.find((p) => p.Id === id);
-    if (producto) {
-      const nuevoNombre = prompt('Ingrese el nuevo nombre:', producto.Nombre);
-      const nuevaCantidad = prompt('Ingrese la nueva cantidad:', producto.StockDisponible.toString());
-      const nuevoPrecio = prompt('Ingrese el nuevo precio:', producto.Precio.toString());
+  cargarProductos() {
+    fetch('http://localhost:3000/productos')
+      .then(res => res.json())
+      .then(data => this.productos = data);
+  }
 
-      if (nuevoNombre && nuevaCantidad && nuevoPrecio) {
-        const productoModificado: Producto = {
-          ...producto,
-          Nombre: nuevoNombre,
-          StockDisponible: +nuevaCantidad,
-          Precio: +nuevoPrecio,
-        };
-        this.productoService.modificarProducto(id, productoModificado); // Llamar al método del servicio
-        this.actualizarLista(); // Actualizar la lista después de modificar
-      }
+  crearProducto() {
+    fetch('http://localhost:3000/productos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.nuevoProducto)
+    })
+    .then(() => {
+      this.nuevoProducto = { Id: 0, Nombre: '', StockDisponible: 0, Precio: 0, ImagenPrincipal: '' };
+      this.cargarProductos();
+    });
+  }
+
+ modificarProducto(producto: any) {
+    const nuevoNombre = prompt('Nuevo nombre:', producto.Nombre);
+    const nuevaCantidad = prompt('Nueva cantidad:', producto.StockDisponible);
+    const nuevoPrecio = prompt('Nuevo precio:', producto.Precio);
+
+    if (nuevoNombre && nuevaCantidad && nuevoPrecio) {
+      const productoModificado = {
+        ...producto,
+        Nombre: nuevoNombre,
+        StockDisponible: +nuevaCantidad,
+        Precio: +nuevoPrecio
+      };
+
+      fetch(`http://localhost:3000/productos/${producto.Id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productoModificado)
+      })
+      .then(() => this.cargarProductos());
     }
   }
 
-  eliminarProducto(id: number): void {
-    this.inventarioService.eliminarProducto(id);
-    this.productoService.eliminarProducto(id);
-    this.actualizarLista();
+  eliminarProducto(id: number) {
+    fetch(`http://localhost:3000/productos/${id}`, {
+      method: 'DELETE'
+    })
+    .then(() => this.cargarProductos());
   }
 
   actualizarLista(): void {
-    this.productos = this.inventarioService.consultarInventario();
-    this.productos = this.productoService.obtenerProductos();
-  }
+  this.cargarProductos(); // Siempre usa la base de datos
+}
 
   generarYGuardarXML(): void {
     const xmlContent = this.productoService.generarXML();
@@ -119,12 +136,12 @@ export class InventarioComponent {
   }
 
   // Manejar la carga de imágenes
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        this.nuevoProducto.ImagenPrincipal = reader.result as string; // Guardar la imagen como URL
+        this.nuevoProducto.ImagenPrincipal = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
