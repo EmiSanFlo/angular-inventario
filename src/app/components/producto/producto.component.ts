@@ -14,14 +14,24 @@ import { InventarioComponent } from "../inventario/inventario.component";
   styleUrl: './producto.component.css'
 
 })
-export class ProductoComponent implements OnInit{
-  productos : Producto[] = [];
+export class ProductoComponent implements OnInit {
+  productos: Producto[] = [];
+  rolUsuario: string | null = null;
+
   constructor(
-    private productoService : ProductoService,
-    private carritoService : CarritoService,
-    private router : Router){}
+    private productoService: ProductoService,
+    private carritoService: CarritoService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    // Lee el rol del usuario desde localStorage
+    const usuarioStr = localStorage.getItem('usuario');
+    if (usuarioStr) {
+      const usuario = JSON.parse(usuarioStr);
+      this.rolUsuario = usuario.rol;
+    }
+
     fetch('http://localhost:3000/productos')
       .then(res => res.json())
       .then(data => {
@@ -31,14 +41,16 @@ export class ProductoComponent implements OnInit{
         console.error('Error al cargar productos:', err);
       });
   }
-  agregarAlCarrito(producto : any){
+
+  agregarAlCarrito(producto: any) {
     this.carritoService.agregarProducto(producto);
   }
-  irAlCarrito(){
-    this.router.navigate(['/carrito'])
+
+  irAlCarrito() {
+    this.router.navigate(['/carrito']);
   }
-  irAlInventario(){
-    this.router.navigate(['/inventario'])
+
+  irAlInventario() {
+    this.router.navigate(['/inventario']);
   }
 }
-

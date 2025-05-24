@@ -1,2 +1,20 @@
-<h1>Discocks</h1>
+<nav class="navbar">
+  <div class="navbar-logo">
+    <img src="assets/dicocks.png" alt="Logo Discocks" height="48">
+  </div>
+  <div class="navbar-buttons">
+    <!-- Botón cuando NO hay sesión -->
+    <button *ngIf="!sesionIniciada" class="login-btn" [routerLink]="['/usuario']">
+      Iniciar Sesión
+    </button>
+    <!-- Botón circular con foto de perfil cuando HAY sesión -->
+    <button *ngIf="sesionIniciada" class="circle-btn" (click)="toggleMenu()">
+      <img [src]="fotoPerfil" alt="Perfil" class="profile-img">
+    </button>
+    <!-- Submenú para cerrar sesión -->
+    <div *ngIf="menuAbierto" class="perfil-menu">
+      <button (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+</nav>
 <router-outlet></router-outlet>

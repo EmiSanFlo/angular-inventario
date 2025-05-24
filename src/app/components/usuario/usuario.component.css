@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+.usuario-outer {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.usuario-card {
+  width: 400px;
+  height: 480px; /* altura fija para mostrar un formulario */
+  background: linear-gradient(90deg, #5C5C5C 0%, #A6A6A6 100%);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  display: block;
+}
+
+.form-slider {
+  width: 100%;
+  height: 1320px; /* 3 veces 440px (3 formularios apilados verticalmente) */
+  display: flex;
+  flex-direction: column; /* apilar verticalmente */
+  transition: transform 0.6s cubic-bezier(.68,-0.55,.27,1.55);
+  will-change: transform;
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.form-slider .form-container {
+  min-width: 100%;
+  height: 440px; /* altura igual a contenedor padre */
+  padding: 36px 32px 24px 32px;
+  box-sizing: border-box;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Mostrar el formulario de login */
+.form-slider:not(.show-register):not(.show-recovery) {
+  transform: translateY(0);
+}
+
+.form-slider:not(.show-register):not(.show-recovery) .login-form {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mostrar el formulario de registro */
+.form-slider.show-register {
+  transform: translateY(-440px); /* subir un formulario */
+}
+
+.form-slider.show-register .register-form {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mostrar el formulario de recuperación */
+.form-slider.show-recovery {
+  transform: translateY(-880px); /* subir dos formularios */
+}
+
+.form-slider.show-recovery .recovery-form {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Responsive para móvil */
+@media (max-width: 450px) {
+  .usuario-card,
+  .form-slider .form-container {
+    width: 100vw;
+    height: auto;
+    min-width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+    padding: 24px 8px;
+  }
+
+  .form-slider {
+    height: auto;
+    flex-direction: column;
+  }
+}
+
+.usuario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.usuario-form input {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  margin-bottom: 4px;
+  color: #222;
+  background: #fff;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.usuario-form input::placeholder {
+  color: #888;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.usuario-form button[type="submit"] {
+  margin-top: 8px;
+  padding: 10px 0;
+  border-radius: 20px;
+  background: #222;
+  color: #fff;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.usuario-form button[type="submit"]:hover {
+  background: #111;
+}
+
+.switch-btn {
+  margin-top: 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+
+.switch-btn:hover {
+  color: #222;
+}
+
+.usuario-card,
+.usuario-form,
+.usuario-form button,
+.switch-btn {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  color: #fff;
+}
+
+.usuario-card h2 {
+  color: #fff;
+  font-weight: 600;
+}

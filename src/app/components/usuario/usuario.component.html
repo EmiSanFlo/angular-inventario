@@ -1,0 +1,61 @@
+<div class="usuario-outer">
+  <div class="usuario-card">
+    <div class="form-slider" 
+         [class.show-register]="mostrarRegistro" 
+         [class.show-recovery]="mostrarRecuperacion">
+
+      <!-- Login Form -->
+      <div class="form-container login-form">
+        <h2>Iniciar Sesión</h2>
+        <form (ngSubmit)="login()" #loginForm="ngForm" class="usuario-form">
+          <input type="text" name="nombreUsuario" [(ngModel)]="loginData.nombreUsuario" placeholder="Nombre de usuario" required>
+          <input type="password" name="contrasena" [(ngModel)]="loginData.contrasena" placeholder="Contraseña" required>
+          <button type="submit">Entrar</button>
+        </form>
+        <button class="switch-btn" (click)="mostrarRegistro = true; mostrarRecuperacion = false">¿No tienes cuenta? Regístrate</button>
+        <button class="switch-btn" (click)="mostrarRecuperacion = true">¿Olvidaste tu contraseña?</button>
+      </div>
+
+      <!-- Register Form -->
+      <div class="form-container register-form">
+        <h2>Registrarse</h2>
+        <form (ngSubmit)="registrarUsuario()" #registroForm="ngForm" class="usuario-form">
+          <input type="text" name="nombreUsuario" [(ngModel)]="registroData.nombreUsuario" placeholder="Nombre de usuario" required>
+          <input type="password" name="contrasena" [(ngModel)]="registroData.contrasena" placeholder="Contraseña" required>
+          <input type="text" name="nombre" [(ngModel)]="registroData.nombre" placeholder="Nombre" required>
+          <input type="text" name="apellido" [(ngModel)]="registroData.apellido" placeholder="Apellido" required>
+          <input type="email" name="email" [(ngModel)]="registroData.email" placeholder="Email" required>
+          <button type="submit">Registrarse</button>
+        </form>
+        <button class="switch-btn" (click)="mostrarRegistro = false">¿Ya tienes cuenta? Inicia sesión</button>
+      </div>
+
+      <!-- Recovery Form -->
+      <div class="form-container recovery-form">
+        <h2>Recuperar Contraseña</h2>
+
+        <!-- Paso 1: Solicitar correo -->
+        <form *ngIf="!codigoEnviado" (ngSubmit)="enviarCodigo()" class="usuario-form">
+          <input type="email" [(ngModel)]="emailRecuperacion" name="email" placeholder="Tu correo electrónico" required>
+          <button type="submit">Enviar código</button>
+        </form>
+
+        <!-- Paso 2: Verificar código y cambiar contraseña -->
+        <form *ngIf="codigoEnviado && !codigoVerificado" (ngSubmit)="verificarCodigo()" class="usuario-form">
+          <input type="text" [(ngModel)]="codigoIngresado" name="codigo" placeholder="Código de 6 dígitos" required>
+          <input type="password" [(ngModel)]="nuevaContrasena" name="nuevaContrasena" placeholder="Nueva contraseña" required>
+          <button type="submit">Cambiar contraseña</button>
+        </form>
+
+        <!-- Paso 3: Confirmación -->
+        <div *ngIf="codigoVerificado">
+          <p>Contraseña cambiada con éxito. Ahora puedes iniciar sesión.</p>
+          <button (click)="resetearFormularios()">Volver al inicio de sesión</button>
+        </div>
+
+        <button class="switch-btn" (click)="mostrarRecuperacion = false; mostrarRegistro = false">Volver</button>
+      </div>
+
+    </div>
+  </div>
+</div>
