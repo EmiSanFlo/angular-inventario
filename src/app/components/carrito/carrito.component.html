@@ -3,9 +3,9 @@
     <h2>Carrito de compra</h2>
     <div *ngIf="carrito.length > 0">
         <ul>
-            <li *ngFor="let producto of carrito; let i = index">
-                <img [src]="producto.ImagenPrincipal" alt="{{ producto.Nombre }}" class="thumbnail">
-                <span>{{ producto.Nombre }} - ${{ producto.Precio }} x {{ producto.StockDisponible }}</span>
+            <li *ngFor="let item of carrito; let i = index">
+                <img [src]="item.producto.ImagenPrincipal" alt="{{ item.producto.Nombre }}" class="thumbnail">
+                <span>{{ item.producto.Nombre }} - ${{ item.producto.Precio }} x {{ item.cantidadEnCarrito }}</span>
                 <div class="button-group">
                     <button class="btn" (click)="agregarOtro(i)">Agregar</button>
                     <button class="btn" (click)="eliminarProducto(i)">Eliminar</button>

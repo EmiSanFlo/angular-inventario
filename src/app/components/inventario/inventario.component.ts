@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { InventarioService } from '../../services/inventario.services'; // Ensure this path is correct
 import { Producto } from '../../models/producto';
 import { ProductoService } from '../../services/producto.service'; // Usar ProductoService
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-inventario',
@@ -134,6 +135,33 @@ export class InventarioComponent {
     link.download = 'inventario.xml';
     link.click();
   }
+
+ generarYDescargarExcel(): void {
+  const datosExcel = this.productos.map(prod => ({
+    ID: prod.Id,
+    Nombre: prod.Nombre,
+    Cantidad: prod.StockDisponible,
+    Precio: prod.Precio,
+    // No incluir imagen base64 aquí
+    // Puedes poner una URL si la tienes, o dejarlo vacío
+    Imagen: prod.ImagenPrincipal ? 'Imagen en base64 no incluida' : ''
+  }));
+
+  const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosExcel);
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+  const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'inventario.xlsx';
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
 
   // Manejar la carga de imágenes
   onFileSelected(event: any) {

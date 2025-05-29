@@ -13,7 +13,7 @@ declare const paypal: any;
 })
 
 export class CarritoComponent implements OnInit{
-  carrito: Producto[] = [];
+carrito: { producto: Producto, cantidadEnCarrito: number }[] = [];
 
   constructor(private carritoService : CarritoService){}
     ngOnInit(){
@@ -43,8 +43,8 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
     }
 
     getTotal(): number {
-      return this.carrito.reduce((total, producto) => total + producto.Precio * producto.StockDisponible, 0);
-    }
+  return this.carritoService.calcularSubtotal();
+}
   
     initPayPalButton(): void {
       paypal.Buttons({
@@ -58,24 +58,42 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
           });
         },
         onApprove: (data: any, actions: any) => {
-          return actions.order.capture().then((details: any) => {
-            alert(`Pago completado por ${details.payer.name.given_name}`);
-            this.generarXML(); // Generar el recibo XML después del pago
-            this.carrito = []; // Vaciar el carrito después del pago
-          });
-        },
+  return actions.order.capture().then((details: any) => {
+    alert(`Pago completado por ${details.payer.name.given_name}`);
+
+    // Prepara arreglo con id y cantidad vendida
+    const ventas = this.carrito.map(item => ({
+      id: item.producto.Id,
+      cantidadVendida: item.cantidadEnCarrito
+    }));
+
+    fetch('http://localhost:3000/productos/actualizar-stock', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ventas)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Error al actualizar stock');
+      return res.text();
+    })
+    .then(msg => {
+      console.log(msg);
+      this.generarXML(); // Generar recibo
+      this.carrito = []; // Vaciar carrito
+    })
+    .catch(err => alert(err.message));
+  });
+},
         onError: (err: any) => {
           console.error('Error en el pago:', err);
         }
       }).render('#paypal-button-container');
     }
 
-    eliminarProducto(index: number): void{
-      this.carrito[index].StockDisponible -= 1;
-      if(this.carrito[index].StockDisponible === 0){
-        this.carrito.splice(index, 1);
-      }
-    }
+    eliminarProducto(index: number) {
+  const item = this.carrito[index];
+  this.carritoService.eliminarUnidad(item.producto.Id);
+}
     
 
     generarXML(): void{
@@ -90,15 +108,7 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
     }
   
     agregarOtro(index: number) {
-      this.carrito[index].StockDisponible += 1;
-    }
-
-    agregarProducto(producto: Producto) {
-      const index = this.carrito.findIndex(p => p.Nombre === producto.Nombre);
-      if (index !== -1) {
-        this.carrito[index].StockDisponible += 1;
-      } else {
-        this.carrito.push({ ...producto, StockDisponible: 1 });
-      }
-    }
+  const item = this.carrito[index];
+  this.carritoService.agregarProducto(item.producto);
+}
 }

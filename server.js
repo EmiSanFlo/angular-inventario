@@ -270,6 +270,39 @@ app.post('/verificar-codigo', (req, res) => {
   });
 });
 
+app.post('/productos/actualizar-stock', (req, res) => {
+  const ventas = req.body; // Espera un arreglo con { id: number, cantidadVendida: number }
+
+  if (!Array.isArray(ventas)) {
+    return res.status(400).send('Formato incorrecto');
+  }
+
+  // Por cada producto vendido, disminuir stock
+  const queries = ventas.map(({ id, cantidadVendida }) => {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        UPDATE producto
+        SET StockDisponible = StockDisponible - ?
+        WHERE Id = ? AND StockDisponible >= ?`;
+      db.query(sql, [cantidadVendida, id, cantidadVendida], (err, result) => {
+        if (err) return reject(err);
+        if (result.affectedRows === 0) {
+          return reject(new Error(`No hay suficiente stock para el producto ID ${id}`));
+        }
+        resolve();
+      });
+    });
+  });
+
+  Promise.all(queries)
+    .then(() => res.send('Stock actualizado correctamente'))
+    .catch(err => {
+      console.error('Error al actualizar stock:', err);
+      res.status(500).send(err.message);
+    });
+});
+
+
 
 // Iniciar el servidor
 const PORT = 3000;

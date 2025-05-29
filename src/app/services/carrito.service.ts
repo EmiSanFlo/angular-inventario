@@ -1,60 +1,80 @@
 import { Injectable } from "@angular/core";
 import { Producto } from "../models/producto";
 
+interface ItemCarrito {
+  producto: Producto;
+  cantidadEnCarrito: number;
+}
+
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class CarritoService {
-    xml: string = '';
-    private carrito: Producto[] = [];
-    private readonly IVA_RATE: number = 0.16; // Tasa de IVA del 16%
+  xml: string = '';
+  private carrito: ItemCarrito[] = [];
+  private readonly IVA_RATE: number = 0.16; // Tasa de IVA del 16%
 
-    agregarProducto(producto: Producto) {
-        this.carrito.push(producto);
+  agregarProducto(producto: Producto) {
+    const item = this.carrito.find(i => i.producto.Id === producto.Id);
+    if (item) {
+      if (item.cantidadEnCarrito < producto.StockDisponible) {
+        item.cantidadEnCarrito++;
+      } else {
+        alert('No hay más stock disponible');
+      }
+    } else {
+      if (producto.StockDisponible > 0) {
+        this.carrito.push({ producto, cantidadEnCarrito: 1 });
+      } else {
+        alert('Producto agotado');
+      }
     }
+  }
 
-    obtenerCarrito(): Producto[] {
-        return this.carrito;
+  eliminarUnidad(productoId: number) {
+    const index = this.carrito.findIndex(i => i.producto.Id === productoId);
+    if (index !== -1) {
+      if (this.carrito[index].cantidadEnCarrito > 1) {
+        this.carrito[index].cantidadEnCarrito--;
+      } else {
+        this.carrito.splice(index, 1);
+      }
     }
+  }
 
-    generarXML(): void {
-        // Crear el contenido básico del XML
-        let xmlContent = '<?xml version="1.0" encoding="UTF-8" ?>\n<factura>\n';
+  obtenerCarrito(): ItemCarrito[] {
+    return this.carrito;
+  }
 
-        // Información de la factura
-        xmlContent += `  <info>\n    <folio>23</folio>\n    <fecha>${new Date().toISOString().split('T')[0]}</fecha>\n    <cliente>\n      <nombre>Usuario</nombre>\n      <email>usuario@correo.com</email>\n    </cliente>\n  </info>\n`;
+  generarXML(): void {
+    let xmlContent = '<?xml version="1.0" encoding="UTF-8" ?>\n<factura>\n';
 
-        // Productos en el carrito
-        xmlContent += `  <productos>\n`;
-        this.carrito.forEach((producto) => {
-            const subtotal = producto.Precio * producto.StockDisponible;
-            xmlContent += `    <producto>\n      <id>${producto.Id}</id>\n      <descripcion>${producto.Nombre}</descripcion>\n      <cantidad>${producto.StockDisponible}</cantidad>\n      <precioUnitario>${producto.Precio}</precioUnitario>\n      <subtotal>${subtotal}</subtotal>\n    </producto>\n`;
-        });
-        xmlContent += `  </productos>\n`;
+    xmlContent += `  <info>\n    <folio>23</folio>\n    <fecha>${new Date().toISOString().split('T')[0]}</fecha>\n    <cliente>\n      <nombre>Usuario</nombre>\n      <email>usuario@correo.com</email>\n    </cliente>\n  </info>\n`;
 
-        // Totales (con IVA)
-        const subtotal = this.calcularSubtotal();
-        const iva = subtotal * this.IVA_RATE;
-        const total = subtotal + iva;
-        xmlContent += `  <totales>\n    <subtotal>${subtotal}</subtotal>\n    <iva>${iva}</iva>\n    <total>${total}</total>\n  </totales>\n`;
+    xmlContent += `  <productos>\n`;
+    this.carrito.forEach((item) => {
+      const subtotal = item.producto.Precio * item.cantidadEnCarrito;
+      xmlContent += `    <producto>\n      <id>${item.producto.Id}</id>\n      <descripcion>${item.producto.Nombre}</descripcion>\n      <cantidad>${item.cantidadEnCarrito}</cantidad>\n      <precioUnitario>${item.producto.Precio}</precioUnitario>\n      <subtotal>${subtotal}</subtotal>\n    </producto>\n`;
+    });
+    xmlContent += `  </productos>\n`;
 
-        // Cerrar la etiqueta de <factura>
-        xmlContent += '</factura>';
+    const subtotal = this.calcularSubtotal();
+    const iva = subtotal * this.IVA_RATE;
+    const total = subtotal + iva;
+    xmlContent += `  <totales>\n    <subtotal>${subtotal}</subtotal>\n    <iva>${iva}</iva>\n    <total>${total}</total>\n  </totales>\n`;
 
-        // Crear un Blob con el contenido XML
-        const blob = new Blob([xmlContent], { type: 'application/xml' });
+    xmlContent += '</factura>';
 
-        // Crear un enlace temporal para la descarga
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'factura.xml';  // Nombre del archivo a descargar
+    this.xml = xmlContent;
 
-        // Disparar el evento de clic para descargar el archivo
-        link.click();
-    }
+    const blob = new Blob([xmlContent], { type: 'application/xml' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'factura.xml';
+    link.click();
+  }
 
-    // Método para calcular el subtotal
-    calcularSubtotal(): number {
-        return this.carrito.reduce((total, producto) => total + (producto.Precio * producto.StockDisponible), 0);
-    }
+  calcularSubtotal(): number {
+    return this.carrito.reduce((total, item) => total + (item.producto.Precio * item.cantidadEnCarrito), 0);
+  }
 }
