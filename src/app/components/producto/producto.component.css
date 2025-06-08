@@ -38,6 +38,25 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Puedes poner esto en producto.component.css */
+.stock-verde {
+  color: #2e7d32;
+  font-weight: bold;
+}
+.stock-amarillo {
+  color: #fbc02d;
+  font-weight: bold;
+}
+.stock-rojo {
+  color: #c62828;
+  font-weight: bold;
+}
+.stock-agotado {
+  color: #222;
+  font-weight: bold;
+  text-decoration: line-through;
+}
+
 .producto:hover {
     transform: translateY(-10px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -55,12 +74,6 @@
     font-weight: bold;
     margin-bottom: 10px;
     color: #333;
-}
-
-.producto p {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 15px;
 }
 
 button {

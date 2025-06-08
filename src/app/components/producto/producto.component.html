@@ -17,7 +17,28 @@
         <img [src]="producto.ImagenPrincipal">
         <h3>{{ producto.Nombre }}</h3>
         <p>Precio: ${{ producto.Precio }}</p>
-        <p>{{ producto.StockDisponible }} unidades</p>
+        <p 
+  [ngClass]="{
+    'stock-verde': producto.StockDisponible > 4,
+    'stock-amarillo': producto.StockDisponible > 1 && producto.StockDisponible <= 4,
+    'stock-rojo': producto.StockDisponible === 1,
+    'stock-agotado': producto.StockDisponible === 0
+  }"
+>
+  <span *ngIf="producto.StockDisponible > 4">
+    {{ producto.StockDisponible }} unidades
+  </span>
+  <span *ngIf="producto.StockDisponible > 1 && producto.StockDisponible <= 4">
+    ¡Quedan solo {{ producto.StockDisponible }} unidades!
+  </span>
+  <span *ngIf="producto.StockDisponible === 1">
+   ¡¡¡ULTIMA UNIDAD DISPONIBLE!!!
+  </span>
+  <span *ngIf="producto.StockDisponible === 0">
+    <s>agotado</s>
+  </span>
+</p>
         <button (click)="agregarAlCarrito(producto)">Agregar al Carrito</button>
+        <button (click)="verDetalle(producto)">Ver Detalles</button>
     </div>
 </div>

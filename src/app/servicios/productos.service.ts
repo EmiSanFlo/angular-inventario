@@ -13,4 +13,10 @@ export class ProductosService {
   obtenerProductos(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
+  getProductoDetalle(id: number) {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+  agregarResena(productoId: number, resena: any) {
+    return this.http.post(`http://localhost:3000/productos/${productoId}/resenas`, resena);
+  }
 }

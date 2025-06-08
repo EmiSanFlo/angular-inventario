@@ -302,7 +302,58 @@ app.post('/productos/actualizar-stock', (req, res) => {
     });
 });
 
+// ...existing code...
 
+// Endpoint para obtener detalle de producto y sus reseñas
+app.get('/productos/:id', (req, res) => {
+    const id = Number(req.params.id);
+
+    // Consulta para el producto
+    const queryProducto = 'SELECT * FROM producto WHERE Id = ?';
+    // Consulta para la descripción
+    const queryDescripcion = 'SELECT Descripcion FROM detalleproducto WHERE ProductoId = ?';
+    // Consulta para las reseñas
+    const queryResenas = `
+  SELECT r.Id, r.ProductoId, r.Puntuacion, r.Comentario, r.Fecha, r.UsuarioId, u.NombreUsuario
+  FROM resenas r
+  JOIN usuarios u ON r.UsuarioId = u.id
+  WHERE r.ProductoId = ?
+  ORDER BY r.Fecha DESC
+`;
+
+    db.query(queryProducto, [id], (err, productoResult) => {
+        if (err) return res.status(500).send('Error al obtener producto');
+        if (productoResult.length === 0) return res.status(404).send('Producto no encontrado');
+
+        db.query(queryDescripcion, [id], (err2, descripcionResult) => {
+            if (err2) return res.status(500).send('Error al obtener descripción');
+
+            db.query(queryResenas, [id], (err3, resenasResult) => {
+  if (err3) return res.status(500).send('Error al obtener reseñas');
+  res.json({
+    producto: productoResult[0],
+    descripcion: descripcionResult[0]?.Descripcion || '',
+    resenas: resenasResult
+  });
+            });
+        });
+    });
+});
+
+app.post('/productos/:id/resenas', (req, res) => {
+  const productoId = Number(req.params.id);
+  const { usuarioId, puntuacion, comentario } = req.body;
+  console.log('Datos recibidos:', { productoId, usuarioId, puntuacion, comentario });
+
+  const query = 'INSERT INTO resenas (ProductoId, UsuarioId, Puntuacion, Comentario, Fecha) VALUES (?, ?, ?, ?, NOW())';
+  db.query(query, [productoId, usuarioId, puntuacion, comentario], (err, result) => {
+    if (err) {
+      console.error('Error al guardar reseña:', err);
+      return res.status(500).send('Error al guardar reseña');
+    }
+    res.json({ success: true });
+  });
+});
 
 // Iniciar el servidor
 const PORT = 3000;

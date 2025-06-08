@@ -1,0 +1,41 @@
+<div class="detalle-container">
+  <div class="imagen-lateral">
+    <img [src]="producto?.ImagenPrincipal" alt="Imagen principal" />
+    <div class="galeria">
+      <img *ngFor="let img of producto?.Imagenes" [src]="img" class="miniatura" />
+    </div>
+  </div>
+  <div class="info-lateral">
+    <h2>{{ producto?.Nombre }}</h2>
+    <p class="precio">Precio: ${{ producto?.Precio }}</p>
+    <p class="stock" [ngClass]="{'agotado': producto?.StockDisponible === 0}">
+      {{ producto?.StockDisponible > 0 ? (producto?.StockDisponible + ' en stock') : 'Agotado' }}
+    </p>
+    <p class="descripcion">{{ descripcion }}</p>
+    <button (click)="agregarAlCarrito(producto)">Agregar al Carrito</button>
+
+<div class="resenas">
+  <h3>Reseñas</h3>
+  <div *ngFor="let resena of resenas">
+  <strong>{{ resena.NombreUsuario }}</strong>
+  <span>({{ resena.Puntuacion }}/5)</span>
+  <span>{{ resena.Fecha | date:'short' }}</span>
+    <div class="puntuacion">
+        <span *ngFor="let n of [1,2,3,4,5]" class="estrella" [ngClass]="{'estrella-llena': n <= resena.Puntuacion}">&#9733;</span>
+    </div>
+  <p>{{ resena.Comentario }}</p>
+</div>
+
+  <!-- Formulario para agregar reseña -->
+  <form *ngIf="usuarioSesion && (usuarioSesion.rol === 'cliente' || usuarioSesion.rol === 'admin')" (ngSubmit)="enviarResena()" #resenaForm="ngForm" style="margin-top:2rem;">
+  <h4>Agregar reseña</h4>
+  <span>Reseña como: <strong>{{ usuarioSesion?.nombre }}</strong></span>
+  <select name="puntuacion" [(ngModel)]="nuevaResena.puntuacion" required>
+    <option value="" disabled selected>Puntuación</option>
+    <option *ngFor="let n of [1,2,3,4,5]" [value]="n">{{n}}</option>
+  </select>
+  <textarea name="comentario" [(ngModel)]="nuevaResena.comentario" placeholder="Comentario" required></textarea>
+  <button type="submit" [disabled]="resenaForm.invalid">Enviar</button>
+</form>
+</div>
+</div>

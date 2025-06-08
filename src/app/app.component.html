@@ -13,8 +13,11 @@
     </button>
     <!-- Submenú para cerrar sesión -->
     <div *ngIf="menuAbierto" class="perfil-menu">
-      <button (click)="cerrarSesion()">Cerrar sesión</button>
-    </div>
+  <div class="nombre-usuario" style="margin-bottom: 0.5rem; font-weight: bold;">
+    {{ usuarioSesion?.nombre }}
+  </div>
+  <button (click)="cerrarSesion()">Cerrar sesión</button>
+</div>
   </div>
 </nav>
 <router-outlet></router-outlet>

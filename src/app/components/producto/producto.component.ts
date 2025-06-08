@@ -47,10 +47,23 @@ export class ProductoComponent implements OnInit {
   }
 
   irAlCarrito() {
-    this.router.navigate(['/carrito']);
+    const usuario = localStorage.getItem('usuario');
+    if (usuario) {
+      this.router.navigate(['/carrito']);
+    } else {
+      this.router.navigate(['/usuario']); // Ajusta la ruta si tu login tiene otro path
+    }
   }
 
   irAlInventario() {
     this.router.navigate(['/inventario']);
   }
+verDetalle(producto: any) {
+  if (producto && producto.Id) {
+    this.router.navigate(['/producto', producto.Id]);
+  } else {
+    alert('No se encontró el ID del producto');
+  }
+}
+
 }

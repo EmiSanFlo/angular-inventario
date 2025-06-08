@@ -74,4 +74,5 @@ export class ProductoService {
     xmlContent += '</inventario>';
     return xmlContent;
   }
+  
 }

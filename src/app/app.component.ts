@@ -13,16 +13,22 @@ import { ProductoComponent } from './components/producto/producto.component';
 })
 export class AppComponent implements OnInit {
   productos: any[] = [];
+  sesionIniciada = false;
+  fotoPerfil = 'assets/icono_default.png';
+  menuAbierto = false;
+  usuarioSesion: any = null; // <-- AGREGA ESTA LÍNEA
 
   constructor(private router: Router) {}
 
   ngOnInit() {
-  if (typeof window !== 'undefined' && window.localStorage) {
-    const usuario = localStorage.getItem('usuario');
-    this.sesionIniciada = !!usuario;
-  } else {
-    this.sesionIniciada = false;
-  }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const usuario = localStorage.getItem('usuario');
+      this.sesionIniciada = !!usuario;
+      this.usuarioSesion = usuario ? JSON.parse(usuario) : null; // <-- Y ESTA LÍNEA
+    } else {
+      this.sesionIniciada = false;
+      this.usuarioSesion = null;
+    }
   fetch('http://localhost:3000/producto')
     .then(response => response.json())
     .then(data => {
@@ -33,15 +39,10 @@ export class AppComponent implements OnInit {
     });
 }
 
-  //esta parte es para las sesiones
-  sesionIniciada = false;
-  fotoPerfil = 'assets/icono_default.png'; // Cambia por la URL real cuando haya sesión
 
   iniciarSesion() {
     this.router.navigate(['/usuario']);
   }
-
-  menuAbierto = false;
 
 toggleMenu() {
   this.menuAbierto = !this.menuAbierto;

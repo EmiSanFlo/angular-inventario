@@ -1,0 +1,162 @@
+/* Contenedor principal */
+.detalle-container {
+  display: flex;
+  gap: 2rem;
+  margin: 2rem auto;
+  max-width: 1100px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 2rem;
+}
+
+/* Imagen lateral */
+.imagen-lateral {
+  flex: 0 0 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.imagen-lateral img {
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 1rem;
+}
+
+.galeria {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.miniatura {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  transition: border 0.2s;
+}
+.miniatura:hover {
+  border: 2px solid #333;
+}
+
+/* Info lateral */
+.info-lateral {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.precio {
+  font-size: 1.3rem;
+  color: #388e3c;
+  font-weight: bold;
+}
+
+.stock {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stock.agotado {
+  color: #c62828;
+  font-weight: bold;
+}
+
+button {
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #444;
+}
+
+.descripcion {
+  background: #f7f7f7;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.resenas {
+  background: #f4f4f9;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+.resenas h3 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.resenas > div {
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.8rem;
+}
+
+.resenas strong {
+  color: #1976d2;
+  font-size: 1.1rem;
+}
+
+.resenas span {
+  color: #666;
+  margin-left: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.resenas p {
+  margin: 0.3rem 0 0.5rem 0;
+  font-size: 1.05rem;
+}
+
+form {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+form input, form select, form textarea {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+  font-size: 1rem;
+  width: 100%;
+  max-width: 350px;
+}
+
+form textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+form button {
+  width: fit-content;
+  align-self: flex-end;
+  margin-top: 0.5rem;
+}
