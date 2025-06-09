@@ -7,6 +7,7 @@
   </div>
   <div class="info-lateral">
     <h2>{{ producto?.Nombre }}</h2>
+    <p>{{ producto.Artista }}</p>
     <p class="precio">Precio: ${{ producto?.Precio }}</p>
     <p class="stock" [ngClass]="{'agotado': producto?.StockDisponible === 0}">
       {{ producto?.StockDisponible > 0 ? (producto?.StockDisponible + ' en stock') : 'Agotado' }}

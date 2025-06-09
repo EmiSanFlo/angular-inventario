@@ -15,7 +15,7 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./inventario.components.css'],
 })
 export class InventarioComponent {
-  nuevoProducto: Producto = { Id: 0, Nombre: '', StockDisponible: 0, Precio: 0, ImagenPrincipal: '' };
+  nuevoProducto: Producto = { Id: 0, Nombre: '', Artista: '', Generos: [], StockDisponible: 0, Precio: 0, ImagenPrincipal: '' };
   productos: Producto[] = [];
 
   constructor(private productoService: ProductoService, private inventarioService: InventarioService, private router: Router) {
@@ -24,46 +24,74 @@ export class InventarioComponent {
 
   ngOnInit() {
     this.cargarProductos();
+    this.cargarGeneros();
   }
 
   cargarProductos() {
-    fetch('http://localhost:3000/productos')
-      .then(res => res.json())
-      .then(data => this.productos = data);
-  }
+  fetch('http://localhost:3000/productos')
+    .then(res => res.json())
+    .then(data => {
+      this.productos = data.map((prod: any) => ({
+        ...prod,
+        Generos: prod.Generos || [],
+        generos: prod.Generos || [] // <--- agrega esto para compatibilidad
+      }));
+    });
+}
 
   crearProducto() {
-    fetch('http://localhost:3000/productos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(this.nuevoProducto)
-    })
-    .then(() => {
-      this.nuevoProducto = { Id: 0, Nombre: '', StockDisponible: 0, Precio: 0, ImagenPrincipal: '' };
-      this.cargarProductos();
-    });
-  }
+  const productoConGeneros = {
+    ...this.nuevoProducto,
+    generos: this.generosSeleccionados
+  };
+  fetch('http://localhost:3000/productos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(productoConGeneros) // <-- Cambia esto
+  })
+  .then(() => {
+    this.nuevoProducto = { Id: 0, Nombre: '', Artista: '', Generos: [], StockDisponible: 0, Precio: 0, ImagenPrincipal: '' };
+    this.generosSeleccionados = [];
+    this.cargarProductos();
+  });
+}
 
  modificarProducto(producto: any) {
     const nuevoNombre = prompt('Nuevo nombre:', producto.Nombre);
     const nuevaCantidad = prompt('Nueva cantidad:', producto.StockDisponible);
     const nuevoPrecio = prompt('Nuevo precio:', producto.Precio);
+    const nuevoArtista = prompt('Nuevo artista:', producto.Artista);
 
-    if (nuevoNombre && nuevaCantidad && nuevoPrecio) {
-      const productoModificado = {
-        ...producto,
-        Nombre: nuevoNombre,
-        StockDisponible: +nuevaCantidad,
-        Precio: +nuevoPrecio
-      };
+    const generosString = this.generos.map(g => `${g.id}: ${g.nombre}`).join('\n');
+    const generosActuales = producto.generos ? producto.generos.map((g: any) => g.id).join(',') : '';
+    const nuevosGeneros = prompt(
+      `IDs de géneros separados por coma:\n${generosString}`,
+      generosActuales
+    );
 
-      fetch(`http://localhost:3000/productos/${producto.Id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productoModificado)
-      })
-      .then(() => this.cargarProductos());
-    }
+    let generosSeleccionados: number[] = [];
+  if (nuevosGeneros) {
+    generosSeleccionados = nuevosGeneros.split(',').map(id => +id.trim()).filter(id => !isNaN(id));
+  }
+
+  if (nuevoNombre && nuevaCantidad && nuevoPrecio) {
+  const productoModificado = {
+    ...producto,
+    Nombre: nuevoNombre,
+    Artista: nuevoArtista || producto.Artista,
+    StockDisponible: +nuevaCantidad,
+    Precio: +nuevoPrecio,
+    generos: generosSeleccionados,
+    Generos: generosSeleccionados // <-- Si tu modelo lo requiere
+  };
+console.log('Enviando al backend:', productoModificado);
+  fetch(`http://localhost:3000/productos/${producto.Id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(productoModificado)
+  })
+  .then(() => this.cargarProductos());
+}
   }
 
   eliminarProducto(id: number) {
@@ -121,6 +149,7 @@ export class InventarioComponent {
       xmlContent += '  <producto>\n';
       xmlContent += `    <id>${producto.Id}</id>\n`;
       xmlContent += `    <nombre>${producto.Nombre}</nombre>\n`;
+      xmlContent += `    <artista>${producto.Artista || 'Desconocido'}</artista>\n`; // Asignar un valor por defecto si no existe
       xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
       xmlContent += `    <precio>${producto.Precio}</precio>\n`;
       xmlContent += `    <imagen>${producto.ImagenPrincipal}</imagen>\n`;
@@ -140,6 +169,7 @@ export class InventarioComponent {
   const datosExcel = this.productos.map(prod => ({
     ID: prod.Id,
     Nombre: prod.Nombre,
+    Artista: prod.Artista || 'Desconocido', // Asignar un valor por defecto si no existe
     Cantidad: prod.StockDisponible,
     Precio: prod.Precio,
     // No incluir imagen base64 aquí
@@ -178,5 +208,15 @@ export class InventarioComponent {
   irAlCatalogo(){
     this.router.navigate(['/']); // Navegar a la ruta principal (catálogo)
   }
+
+  generos: any[] = [];
+  generosSeleccionados: number[] = [];
+
+cargarGeneros() {
+  fetch('http://localhost:3000/generos')
+    .then(res => res.json())
+    .then(data => this.generos = data)
+    .catch(err => console.error('Error al cargar géneros:', err));
+}
 }
 

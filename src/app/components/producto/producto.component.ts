@@ -4,12 +4,13 @@ import { ProductoService } from '../../services/producto.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { CarritoService } from '../../services/carrito.service';
+import { FormsModule } from '@angular/forms';
 import { InventarioComponent } from "../inventario/inventario.component";
 
 @Component({
   standalone:true,
   selector: 'app-producto',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './producto.component.html',
   styleUrl: './producto.component.css'
 
@@ -17,6 +18,10 @@ import { InventarioComponent } from "../inventario/inventario.component";
 export class ProductoComponent implements OnInit {
   productos: Producto[] = [];
   rolUsuario: string | null = null;
+  productosFiltrados: any[] = [];
+  filtroNombre: string = '';
+  filtroArtista: string = '';
+  filtroGenero: string = '';
 
   constructor(
     private productoService: ProductoService,
@@ -31,12 +36,12 @@ export class ProductoComponent implements OnInit {
       const usuario = JSON.parse(usuarioStr);
       this.rolUsuario = usuario.rol;
     }
-
     fetch('http://localhost:3000/productos')
-      .then(res => res.json())
-      .then(data => {
-        this.productos = data;
-      })
+    .then(res => res.json())
+    .then(data => {
+      this.productos = data;
+      this.productosFiltrados = data;
+    })
       .catch(err => {
         console.error('Error al cargar productos:', err);
       });
@@ -66,4 +71,15 @@ verDetalle(producto: any) {
   }
 }
 
+buscarProductos() {
+  this.productosFiltrados = this.productos.filter(producto => {
+    const nombreMatch = producto.Nombre.toLowerCase().includes(this.filtroNombre.toLowerCase());
+    const artistaMatch = producto.Artista.toLowerCase().includes(this.filtroArtista.toLowerCase());
+    // Si tienes producto.Generos, ajusta aquí. Si no, ignora filtroGenero.
+    const generoMatch = this.filtroGenero
+      ? (producto.Generos && producto.Generos.some(g => g.nombre?.toLowerCase().includes(this.filtroGenero.toLowerCase())))
+      : true;
+    return nombreMatch && artistaMatch && generoMatch;
+  });
+}
 }

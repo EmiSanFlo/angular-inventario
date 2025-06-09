@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Producto } from '../models/producto';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,9 @@ export class ProductoService {
   private productosSubject = new BehaviorSubject<Producto[]>(this.productos);
   productos$ = this.productosSubject.asObservable(); // Observable para suscribirse
 
+  private apiUrl = 'http://localhost:3000/productos';
+
+  constructor(private http: HttpClient) { }
 
   cargarCatalogoDesdeXML(xmlContent: string): void {
     const parser = new DOMParser();
@@ -26,6 +30,8 @@ export class ProductoService {
       const producto: Producto = {
         Id: +productoXML.getElementsByTagName('id')[0].textContent!,
         Nombre: productoXML.getElementsByTagName('nombre')[0].textContent!,
+        Artista: productoXML.getElementsByTagName('artista')[0].textContent!,
+        Generos: Array.from(productoXML.getElementsByTagName('genero')).map(genero => ({ nombre: genero.textContent! })),
         StockDisponible: +productoXML.getElementsByTagName('cantidad')[0].textContent!,
         Precio: +productoXML.getElementsByTagName('precio')[0].textContent!,
         ImagenPrincipal: productoXML.getElementsByTagName('imagen')[0].textContent!,
@@ -73,6 +79,14 @@ export class ProductoService {
   
     xmlContent += '</inventario>';
     return xmlContent;
+  }
+
+  buscarProductos(nombre: string, artista: string, genero: string): Observable<Producto[]> {
+    let params: any = {};
+    if (nombre) params.nombre = nombre;
+    if (artista) params.artista = artista;
+    if (genero) params.genero = genero;
+    return this.http.get<Producto[]>(this.apiUrl, { params });
   }
   
 }

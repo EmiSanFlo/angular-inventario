@@ -27,18 +27,14 @@ db.connect((err) => {
 
 // Endpoint para obtener productos
 app.get('/productos', (req, res) => {
-    const query = `
-        SELECT Id, Nombre, Precio, StockDisponible, ImagenPrincipal
-        FROM producto;
-    `;
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error al obtener productos:', err);
-            res.status(500).send('Error al obtener productos');
-            return;
-        }
-        res.json(results);
-    });
+  const query = `
+    SELECT Id, Nombre, Precio, StockDisponible, ImagenPrincipal, Artista
+    FROM producto
+  `;
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).send('Error al obtener productos');
+    res.json(results);
+  });
 });
 
 app.use(express.json()); // Asegúrate de tener esto para parsear JSON
@@ -79,11 +75,22 @@ app.post('/productos/importar', (req, res) => {
 
 // Crear producto
 app.post('/productos', (req, res) => {
-    const { Nombre, Precio, StockDisponible, ImagenPrincipal } = req.body;
-    const query = 'INSERT INTO producto (Nombre, Precio, StockDisponible, ImagenPrincipal) VALUES (?, ?, ?, ?)';
-    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal], (err, result) => {
+    const { Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, generos } = req.body;
+    const query = 'INSERT INTO producto (Nombre, Precio, StockDisponible, ImagenPrincipal, Artista) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, Artista], (err, result) => {
         if (err) return res.status(500).send('Error al agregar producto');
-        res.send('Producto agregado');
+        const productoId = result.insertId;
+
+        // Si se envían géneros, inserta en la tabla intermedia
+        if (Array.isArray(generos) && generos.length > 0) {
+            const values = generos.map(generoId => [productoId, generoId]);
+            db.query('INSERT INTO producto_genero (ProductoId, GeneroId) VALUES ?', [values], (err2) => {
+                if (err2) return res.status(500).send('Error al asignar géneros');
+                res.send('Producto agregado con géneros');
+            });
+        } else {
+            res.send('Producto agregado');
+        }
     });
 });
 
@@ -95,17 +102,6 @@ app.delete('/productos/:id', (req, res) => {
         if (err) return res.status(500).send('Error al eliminar producto');
         if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
         res.send('Producto eliminado');
-    });
-});
-
-app.put('/productos/:id', (req, res) => {
-    const id = Number(req.params.id); // <-- fuerza a número
-    const { Nombre, Precio, StockDisponible, ImagenPrincipal } = req.body;
-    const query = 'UPDATE producto SET Nombre=?, Precio=?, StockDisponible=?, ImagenPrincipal=? WHERE Id=?';
-    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, id], (err, result) => {
-        if (err) return res.status(500).send('Error al modificar producto');
-        if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
-        res.send('Producto modificado');
     });
 });
 
@@ -353,6 +349,77 @@ app.post('/productos/:id/resenas', (req, res) => {
     }
     res.json({ success: true });
   });
+});
+
+app.put('/productos/:id', (req, res) => {
+      console.log('BODY RECIBIDO:', req.body); // <-- AGREGA ESTO
+    const id = Number(req.params.id);
+    const { Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, generos } = req.body;
+
+    // Actualiza producto (incluyendo Artista)
+    const query = 'UPDATE producto SET Nombre=?, Precio=?, StockDisponible=?, ImagenPrincipal=?, Artista=? WHERE Id=?';
+    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, id], (err, result) => {
+        if (err) return res.status(500).send('Error al modificar producto');
+        if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
+
+        // Actualiza géneros si se envían
+        if (Array.isArray(generos)) {
+            db.query('DELETE FROM producto_genero WHERE ProductoId=?', [id], (err2) => {
+                if (err2) return res.status(500).send('Error al actualizar géneros');
+                if (generos.length === 0) return res.send('Producto modificado y géneros actualizados');
+                const values = generos.map(generoId => [id, generoId]);
+                db.query('INSERT INTO producto_genero (ProductoId, GeneroId) VALUES ?', [values], (err3) => {
+                    if (err3) return res.status(500).send('Error al insertar géneros');
+                    res.send('Producto modificado y géneros actualizados');
+                });
+            });
+        } else {
+            res.send('Producto modificado');
+        }
+    });
+});
+
+app.get('/productos/:id/generos', (req, res) => {
+    const id = Number(req.params.id);
+    const query = `
+        SELECT g.id, g.nombre
+        FROM genero g
+        JOIN producto_genero pg ON g.id = pg.GeneroId
+        WHERE pg.ProductoId = ?
+    `;
+    db.query(query, [id], (err, results) => {
+        if (err) return res.status(500).send('Error al obtener géneros');
+        res.json(results);
+    });
+});
+
+app.get('/generos', (req, res) => {
+    const query = 'SELECT id, nombre FROM genero';
+    db.query(query, (err, results) => {
+        if (err) return res.status(500).send('Error al obtener géneros');
+        res.json(results);
+    });
+});
+
+app.post('/productos', (req, res) => {
+      console.log(req.body); // <-- Agrega esto
+    const { Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, generos } = req.body;
+    const query = 'INSERT INTO producto (Nombre, Precio, StockDisponible, ImagenPrincipal, Artista) VALUES (?, ?, ?, ?, ?)';
+    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, Artista], (err, result) => {
+        if (err) return res.status(500).send('Error al agregar producto');
+        const productoId = result.insertId;
+
+        // Si se envían géneros, inserta en la tabla intermedia
+        if (Array.isArray(generos) && generos.length > 0) {
+            const values = generos.map(generoId => [productoId, generoId]);
+            db.query('INSERT INTO producto_genero (ProductoId, GeneroId) VALUES ?', [values], (err2) => {
+                if (err2) return res.status(500).send('Error al asignar géneros');
+                res.send('Producto agregado con géneros');
+            });
+        } else {
+            res.send('Producto agregado');
+        }
+    });
 });
 
 // Iniciar el servidor

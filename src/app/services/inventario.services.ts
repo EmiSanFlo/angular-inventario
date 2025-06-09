@@ -9,16 +9,21 @@ export class InventarioService {
 
   constructor() {}
 
-  crearProducto(producto: Producto): void {
-    this.inventario.push(producto);
-  }
+  ccrearProducto(producto: Producto): Promise<any> {
+  return fetch('http://localhost:3000/productos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(producto)
+  }).then(res => res.json());
+}
 
-  modificarProducto(id: number, nuevoProducto: Producto): void {
-    const index = this.inventario.findIndex((p) => p.Id === id);
-    if (index !== -1) {
-      this.inventario[index] = { ...this.inventario[index], ...nuevoProducto };
-    }
-  }
+  modificarProducto(id: number, nuevoProducto: Producto): Promise<any> {
+  return fetch(`http://localhost:3000/productos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(nuevoProducto)
+  }).then(res => res.json());
+}
 
   eliminarProducto(id: number): void {
     this.inventario = this.inventario.filter((p) => p.Id !== id);

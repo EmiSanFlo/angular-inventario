@@ -4,6 +4,10 @@
       <h2>Agregar Producto</h2>
       <!-- ...otros elementos... -->
       <input [(ngModel)]="nuevoProducto.Nombre" placeholder="Nombre" />
+      <input [(ngModel)]="nuevoProducto.Artista" placeholder="Artista" />
+      <select multiple [(ngModel)]="generosSeleccionados">
+        <option *ngFor="let genero of generos" [value]="genero.id">{{ genero.nombre }}</option>
+      </select>
       <input [(ngModel)]="nuevoProducto.StockDisponible" placeholder="Cantidad" type="number" />
       <input [(ngModel)]="nuevoProducto.Precio" placeholder="Precio" type="number" />
       <input type="file" (change)="onFileSelected($event)" accept="image/*" />
