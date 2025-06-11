@@ -218,5 +218,14 @@ cargarGeneros() {
     .then(data => this.generos = data)
     .catch(err => console.error('Error al cargar géneros:', err));
 }
+
+historial: any[] = [];
+
+cargarHistorial() {
+  fetch('http://localhost:3000/historial')
+    .then(res => res.json())
+    .then(data => this.historial = data)
+    .catch(err => console.error('Error al cargar historial:', err));
+}
 }
 

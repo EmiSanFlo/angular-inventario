@@ -352,30 +352,49 @@ app.post('/productos/:id/resenas', (req, res) => {
 });
 
 app.put('/productos/:id', (req, res) => {
-      console.log('BODY RECIBIDO:', req.body); // <-- AGREGA ESTO
     const id = Number(req.params.id);
     const { Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, generos } = req.body;
 
-    // Actualiza producto (incluyendo Artista)
-    const query = 'UPDATE producto SET Nombre=?, Precio=?, StockDisponible=?, ImagenPrincipal=?, Artista=? WHERE Id=?';
-    db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, id], (err, result) => {
-        if (err) return res.status(500).send('Error al modificar producto');
-        if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
+    // Obtener stock anterior
+    db.query('SELECT StockDisponible FROM producto WHERE Id=?', [id], (err, resultStock) => {
+        if (err) return res.status(500).send('Error al obtener stock anterior');
+        if (resultStock.length === 0) return res.status(404).send('Producto no encontrado');
+        const stockAnterior = resultStock[0].StockDisponible;
 
-        // Actualiza géneros si se envían
-        if (Array.isArray(generos)) {
-            db.query('DELETE FROM producto_genero WHERE ProductoId=?', [id], (err2) => {
-                if (err2) return res.status(500).send('Error al actualizar géneros');
-                if (generos.length === 0) return res.send('Producto modificado y géneros actualizados');
-                const values = generos.map(generoId => [id, generoId]);
-                db.query('INSERT INTO producto_genero (ProductoId, GeneroId) VALUES ?', [values], (err3) => {
-                    if (err3) return res.status(500).send('Error al insertar géneros');
-                    res.send('Producto modificado y géneros actualizados');
+        // Actualiza producto
+        const query = 'UPDATE producto SET Nombre=?, Precio=?, StockDisponible=?, ImagenPrincipal=?, Artista=? WHERE Id=?';
+        db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, id], (err, result) => {
+            if (err) return res.status(500).send('Error al modificar producto');
+            if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
+
+            // Registrar historial si cambió el stock
+            const diferencia = StockDisponible - stockAnterior;
+            if (diferencia !== 0) {
+                const tipo = diferencia > 0 ? 'entrada' : 'salida';
+                db.query(
+                  'INSERT INTO historial_inventario (producto_id, tipo_movimiento, cantidad, descripcion) VALUES (?, ?, ?, ?)',
+                  [id, tipo, Math.abs(diferencia), 'Modificación de stock'],
+                  (errHist) => {
+                    if (errHist) console.error('Error al registrar historial:', errHist);
+                  }
+                );
+            }
+
+            // Actualiza géneros si se envían
+            if (Array.isArray(generos)) {
+                db.query('DELETE FROM producto_genero WHERE ProductoId=?', [id], (err2) => {
+                    if (err2) return res.status(500).send('Error al actualizar géneros');
+                    if (generos.length === 0) return res.send('Producto modificado y géneros actualizados');
+                    const values = generos.map(generoId => [id, generoId]);
+                    db.query('INSERT INTO producto_genero (ProductoId, GeneroId) VALUES ?', [values], (err3) => {
+                        if (err3) return res.status(500).send('Error al insertar géneros');
+                        res.send('Producto modificado y géneros actualizados');
+                    });
                 });
-            });
-        } else {
-            res.send('Producto modificado');
-        }
+            } else {
+                res.send('Producto modificado');
+            }
+        });
     });
 });
 
@@ -402,12 +421,20 @@ app.get('/generos', (req, res) => {
 });
 
 app.post('/productos', (req, res) => {
-      console.log(req.body); // <-- Agrega esto
     const { Nombre, Precio, StockDisponible, ImagenPrincipal, Artista, generos } = req.body;
     const query = 'INSERT INTO producto (Nombre, Precio, StockDisponible, ImagenPrincipal, Artista) VALUES (?, ?, ?, ?, ?)';
     db.query(query, [Nombre, Precio, StockDisponible, ImagenPrincipal, Artista], (err, result) => {
         if (err) return res.status(500).send('Error al agregar producto');
         const productoId = result.insertId;
+
+        // Registrar entrada en historial
+        db.query(
+          'INSERT INTO historial_inventario (producto_id, tipo_movimiento, cantidad, descripcion) VALUES (?, "entrada", ?, ?)',
+          [productoId, StockDisponible, 'Alta de producto'],
+          (errHist) => {
+            if (errHist) console.error('Error al registrar historial:', errHist);
+          }
+        );
 
         // Si se envían géneros, inserta en la tabla intermedia
         if (Array.isArray(generos) && generos.length > 0) {
@@ -420,6 +447,19 @@ app.post('/productos', (req, res) => {
             res.send('Producto agregado');
         }
     });
+});
+
+app.get('/historial', (req, res) => {
+    db.query(
+      `SELECT h.*, p.Nombre AS producto_nombre 
+       FROM historial_inventario h 
+       JOIN producto p ON h.producto_id = p.id 
+       ORDER BY h.fecha DESC`,
+      (err, results) => {
+        if (err) return res.status(500).send('Error al obtener historial');
+        res.json(results);
+      }
+    );
 });
 
 // Iniciar el servidor

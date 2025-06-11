@@ -36,7 +36,34 @@
     <button (click)="eliminarProducto(producto.Id)">Eliminar</button>
   </li>
 </ul>
+    <div class="button-group">
       <button (click)="generarXML()">Generar y Descargar XML</button>
       <button (click)="generarYDescargarExcel()">Exportar a Excel</button>
+      <button (click)="cargarHistorial()">Ver historial</button>
+    </div>
+
+      <div *ngIf="historial.length > 0">
+  <h3>Historial de movimientos</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Producto</th>
+        <th>Tipo</th>
+        <th>Cantidad</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let mov of historial">
+        <td>{{ mov.fecha | date:'short' }}</td>
+        <td>{{ mov.producto_nombre }}</td>
+        <td>{{ mov.tipo_movimiento }}</td>
+        <td>{{ mov.cantidad }}</td>
+        <td>{{ mov.descripcion }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   </div>
 </div>

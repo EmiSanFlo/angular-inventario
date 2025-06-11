@@ -19,9 +19,7 @@ export class ProductoComponent implements OnInit {
   productos: Producto[] = [];
   rolUsuario: string | null = null;
   productosFiltrados: any[] = [];
-  filtroNombre: string = '';
-  filtroArtista: string = '';
-  filtroGenero: string = '';
+  filtroGeneral: string = '';
 
   constructor(
     private productoService: ProductoService,
@@ -72,14 +70,14 @@ verDetalle(producto: any) {
 }
 
 buscarProductos() {
+  const filtro = this.filtroGeneral.trim().toLowerCase();
   this.productosFiltrados = this.productos.filter(producto => {
-    const nombreMatch = producto.Nombre.toLowerCase().includes(this.filtroNombre.toLowerCase());
-    const artistaMatch = producto.Artista.toLowerCase().includes(this.filtroArtista.toLowerCase());
-    // Si tienes producto.Generos, ajusta aquí. Si no, ignora filtroGenero.
-    const generoMatch = this.filtroGenero
-      ? (producto.Generos && producto.Generos.some(g => g.nombre?.toLowerCase().includes(this.filtroGenero.toLowerCase())))
-      : true;
-    return nombreMatch && artistaMatch && generoMatch;
+    const nombre = producto.Nombre?.toLowerCase() || '';
+    const artista = producto.Artista?.toLowerCase() || '';
+    // Si tienes géneros, descomenta la siguiente línea:
+    // const generos = (producto.Generos || []).map(g => g.nombre?.toLowerCase()).join(' ');
+    // return nombre.includes(filtro) || artista.includes(filtro) || generos.includes(filtro);
+    return nombre.includes(filtro) || artista.includes(filtro);
   });
 }
 }

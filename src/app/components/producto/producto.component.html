@@ -3,10 +3,9 @@
         <h1>Catalogo de Productos</h1>    
     </div>
     <div class="navbar-search">
-        <input type="text" placeholder="Buscar por nombre..." [(ngModel)]="filtroNombre">
-        <input type="text" placeholder="Buscar por artista..." [(ngModel)]="filtroArtista">
-        <button (click)="buscarProductos()">Buscar</button>
-    </div>
+  <input type="text" placeholder="Buscar por nombre, artista o género..." [(ngModel)]="filtroGeneral">
+  <button (click)="buscarProductos()">Buscar</button>
+</div>
     <div class="navbar-buttons">
         <div>
         <button *ngIf="rolUsuario === 'admin'" (click)="irAlInventario()">Ir al Inventario</button>
