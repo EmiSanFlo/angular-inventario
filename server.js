@@ -27,13 +27,35 @@ db.connect((err) => {
 
 // Endpoint para obtener productos
 app.get('/productos', (req, res) => {
-  const query = `
+  // Trae todos los productos
+  const queryProductos = `
     SELECT Id, Nombre, Precio, StockDisponible, ImagenPrincipal, Artista
     FROM producto
   `;
-  db.query(query, (err, results) => {
+  db.query(queryProductos, (err, productos) => {
     if (err) return res.status(500).send('Error al obtener productos');
-    res.json(results);
+    if (productos.length === 0) return res.json([]);
+
+    // Trae todos los géneros relacionados
+    const productoIds = productos.map(p => p.Id);
+    const queryGeneros = `
+      SELECT pg.ProductoId, g.id, g.nombre
+      FROM producto_genero pg
+      JOIN genero g ON pg.GeneroId = g.id
+      WHERE pg.ProductoId IN (?)
+    `;
+    db.query(queryGeneros, [productoIds], (err2, generos) => {
+      if (err2) return res.status(500).send('Error al obtener géneros');
+
+      // Asocia los géneros a cada producto
+      productos.forEach(producto => {
+        producto.Generos = generos
+          .filter(g => g.ProductoId === producto.Id)
+          .map(g => ({ id: g.id, nombre: g.nombre }));
+      });
+
+      res.json(productos);
+    });
   });
 });
 
@@ -310,12 +332,19 @@ app.get('/productos/:id', (req, res) => {
     const queryDescripcion = 'SELECT Descripcion FROM detalleproducto WHERE ProductoId = ?';
     // Consulta para las reseñas
     const queryResenas = `
-  SELECT r.Id, r.ProductoId, r.Puntuacion, r.Comentario, r.Fecha, r.UsuarioId, u.NombreUsuario
-  FROM resenas r
-  JOIN usuarios u ON r.UsuarioId = u.id
-  WHERE r.ProductoId = ?
-  ORDER BY r.Fecha DESC
-`;
+      SELECT r.Id, r.ProductoId, r.Puntuacion, r.Comentario, r.Fecha, r.UsuarioId, u.NombreUsuario
+      FROM resenas r
+      JOIN usuarios u ON r.UsuarioId = u.id
+      WHERE r.ProductoId = ?
+      ORDER BY r.Fecha DESC
+    `;
+    // Consulta para los géneros
+    const queryGeneros = `
+      SELECT g.id, g.nombre
+      FROM producto_genero pg
+      JOIN genero g ON pg.GeneroId = g.id
+      WHERE pg.ProductoId = ?
+    `;
 
     db.query(queryProducto, [id], (err, productoResult) => {
         if (err) return res.status(500).send('Error al obtener producto');
@@ -325,12 +354,21 @@ app.get('/productos/:id', (req, res) => {
             if (err2) return res.status(500).send('Error al obtener descripción');
 
             db.query(queryResenas, [id], (err3, resenasResult) => {
-  if (err3) return res.status(500).send('Error al obtener reseñas');
-  res.json({
-    producto: productoResult[0],
-    descripcion: descripcionResult[0]?.Descripcion || '',
-    resenas: resenasResult
-  });
+                if (err3) return res.status(500).send('Error al obtener reseñas');
+
+                db.query(queryGeneros, [id], (err4, generosResult) => {
+                    if (err4) return res.status(500).send('Error al obtener géneros');
+
+                    // Adjunta los géneros al producto
+                    const producto = productoResult[0];
+                    producto.Generos = generosResult;
+
+                    res.json({
+                        producto: producto,
+                        descripcion: descripcionResult[0]?.Descripcion || '',
+                        resenas: resenasResult
+                    });
+                });
             });
         });
     });

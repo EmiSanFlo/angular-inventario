@@ -7,6 +7,27 @@
   </div>
   <div class="info-lateral">
     <h2>{{ producto?.Nombre }}</h2>
+
+<div *ngIf="resenas?.length" class="promedio-puntuacion">
+  <span class="estrellas-promedio">
+    <ng-container *ngFor="let n of [1,2,3,4,5]">
+      <span
+        [ngClass]="{
+          'estrella-llena': n <= Math.floor(promedioPuntuacion),
+          'estrella-media': n > Math.floor(promedioPuntuacion) && n - promedioPuntuacion <= 1 && n - promedioPuntuacion > 0,
+          'estrella-vacia': n > promedioPuntuacion
+        }"
+      >&#9733;</span>
+    </ng-container>
+  </span>
+  <span class="valor-promedio">({{ promedioPuntuacion | number:'1.1-2' }}/5)</span>
+</div>
+
+<div class="generos" *ngIf="producto?.Generos?.length">
+  <span class="genero-etiqueta" *ngFor="let genero of producto.Generos">
+    {{ genero.nombre }}
+  </span>
+</div>
     <p>{{ producto.Artista }}</p>
     <p class="precio">Precio: ${{ producto?.Precio }}</p>
     <p class="stock" [ngClass]="{'agotado': producto?.StockDisponible === 0}">
@@ -21,9 +42,12 @@
   <strong>{{ resena.NombreUsuario }}</strong>
   <span>({{ resena.Puntuacion }}/5)</span>
   <span>{{ resena.Fecha | date:'short' }}</span>
-    <div class="puntuacion">
-        <span *ngFor="let n of [1,2,3,4,5]" class="estrella" [ngClass]="{'estrella-llena': n <= resena.Puntuacion}">&#9733;</span>
-    </div>
+    <!-- Dentro del *ngFor="let resena of resenas" -->
+<div class="puntuacion">
+  <ng-container *ngFor="let n of [1,2,3,4,5]">
+    <span [ngClass]="{'estrella-llena': n <= +resena.Puntuacion, 'estrella-vacia': n > +resena.Puntuacion}">&#9733;</span>
+  </ng-container>
+</div>
   <p>{{ resena.Comentario }}</p>
 </div>
 

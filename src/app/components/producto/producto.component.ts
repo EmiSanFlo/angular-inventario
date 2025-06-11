@@ -74,10 +74,8 @@ buscarProductos() {
   this.productosFiltrados = this.productos.filter(producto => {
     const nombre = producto.Nombre?.toLowerCase() || '';
     const artista = producto.Artista?.toLowerCase() || '';
-    // Si tienes géneros, descomenta la siguiente línea:
-    // const generos = (producto.Generos || []).map(g => g.nombre?.toLowerCase()).join(' ');
-    // return nombre.includes(filtro) || artista.includes(filtro) || generos.includes(filtro);
-    return nombre.includes(filtro) || artista.includes(filtro);
+    const generos = (producto.Generos || []).map(g => g.nombre?.toLowerCase()).join(' ');
+    return nombre.includes(filtro) || artista.includes(filtro) || generos.includes(filtro);
   });
 }
 }

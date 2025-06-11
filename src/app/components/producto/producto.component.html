@@ -21,6 +21,11 @@
         <img [src]="producto.ImagenPrincipal">
         <h3>{{ producto.Nombre }}</h3>
         <p>{{ producto.Artista }}</p>
+        <div class="generos">
+          <span class="genero-etiqueta" *ngFor="let genero of producto.Generos">
+            {{ genero.nombre }}
+          </span>
+        </div>
         <p>Precio: ${{ producto.Precio }}</p>
         <p 
   [ngClass]="{

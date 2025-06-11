@@ -203,3 +203,37 @@ button:last-of-type:hover {
     font-weight: bold;
     text-decoration: line-through;
 }
+
+.generos {
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center; /* <-- Esto centra las etiquetas */
+}
+
+.genero-etiqueta {
+  background: linear-gradient(90deg, #222 60%, #444 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1.5px solid #fff;
+  transition: background 0.2s, transform 0.2s;
+  margin-bottom: 0; /* <-- importante para que no se apilen hacia abajo */
+  width: auto;      /* <-- asegura que el ancho sea solo el del texto */
+  min-width: 0;     /* <-- previene estiramiento innecesario */
+  display: inline-block; /* <-- asegura comportamiento tipo chip */
+}
+
+.genero-etiqueta:hover {
+  background: linear-gradient(90deg, #000 60%, #333 100%);
+  transform: scale(1.08);
+  cursor: pointer;
+  border-color: #222;
+}

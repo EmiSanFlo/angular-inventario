@@ -160,3 +160,61 @@ form button {
   align-self: flex-end;
   margin-top: 0.5rem;
 }
+
+.generos {
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.genero-etiqueta {
+  background: linear-gradient(90deg, #222 60%, #444 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 4px 14px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1.5px solid #fff;
+  transition: background 0.2s, transform 0.2s;
+  margin-bottom: 0; /* <-- importante para que no se apilen hacia abajo */
+  width: auto;      /* <-- asegura que el ancho sea solo el del texto */
+  min-width: 0;     /* <-- previene estiramiento innecesario */
+  display: inline-block; /* <-- asegura comportamiento tipo chip */
+}
+
+.genero-etiqueta:hover {
+  background: linear-gradient(90deg, #000 60%, #333 100%);
+  transform: scale(1.08);
+  cursor: pointer;
+  border-color: #222;
+}
+
+/* Puedes poner esto en producto-detalle.component.css */
+.estrella-llena {
+  color: #fbc02d;
+}
+.estrella-media {
+  color: #fbc02d;
+  position: relative;
+}
+.estrella-media::after {
+  content: '\\2605';
+  color: #bbb;
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  overflow: hidden;
+}
+.estrella-vacia {
+  color: #bbb;
+}
+.estrellas-promedio .estrella-llena,
+.estrellas-promedio .estrella-media,
+.estrellas-promedio .estrella-vacia {
+  font-size: 1.5rem;
+}
