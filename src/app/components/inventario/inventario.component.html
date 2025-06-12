@@ -5,9 +5,17 @@
       <!-- ...otros elementos... -->
       <input [(ngModel)]="nuevoProducto.Nombre" placeholder="Nombre" />
       <input [(ngModel)]="nuevoProducto.Artista" placeholder="Artista" />
-      <select multiple [(ngModel)]="generosSeleccionados">
-        <option *ngFor="let genero of generos" [value]="genero.id">{{ genero.nombre }}</option>
-      </select>
+      <div class="generos-checkboxes">
+  <label *ngFor="let genero of generos" style="display: block; margin-bottom: 4px;">
+    <input
+      type="checkbox"
+      [value]="genero.id"
+      [(ngModel)]="genero.checked"
+      (change)="actualizarGenerosSeleccionados()"
+    />
+    {{ genero.nombre }}
+  </label>
+</div>
       <input [(ngModel)]="nuevoProducto.StockDisponible" placeholder="Cantidad" type="number" />
       <input [(ngModel)]="nuevoProducto.Precio" placeholder="Precio" type="number" />
       <input type="file" (change)="onFileSelected($event)" accept="image/*" />

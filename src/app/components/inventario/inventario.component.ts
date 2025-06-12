@@ -95,11 +95,13 @@ console.log('Enviando al backend:', productoModificado);
   }
 
   eliminarProducto(id: number) {
+  if (confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer')) {
     fetch(`http://localhost:3000/productos/${id}`, {
       method: 'DELETE'
     })
     .then(() => this.cargarProductos());
   }
+}
 
   actualizarLista(): void {
   this.cargarProductos(); // Siempre usa la base de datos
@@ -212,10 +214,19 @@ console.log('Enviando al backend:', productoModificado);
   generos: any[] = [];
   generosSeleccionados: number[] = [];
 
+  actualizarGenerosSeleccionados() {
+  this.generosSeleccionados = this.generos
+    .filter(g => g.checked)
+    .map(g => g.id);
+}
+
 cargarGeneros() {
   fetch('http://localhost:3000/generos')
     .then(res => res.json())
-    .then(data => this.generos = data)
+    .then(data => {
+      // Asegura que cada género tenga la propiedad checked en false
+      this.generos = data.map((g: any) => ({ ...g, checked: false }));
+    })
     .catch(err => console.error('Error al cargar géneros:', err));
 }
 

@@ -116,14 +116,18 @@ app.post('/productos', (req, res) => {
     });
 });
 
-// Modificar producto
+// Eliminar producto producto
 app.delete('/productos/:id', (req, res) => {
-    const id = Number(req.params.id); // <-- fuerza a número
-    const query = 'DELETE FROM producto WHERE Id=?';
-    db.query(query, [id], (err, result) => {
-        if (err) return res.status(500).send('Error al eliminar producto');
-        if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
-        res.send('Producto eliminado');
+    const id = Number(req.params.id);
+    // Elimina relaciones en producto_genero
+    db.query('DELETE FROM producto_genero WHERE ProductoId=?', [id], (err) => {
+        if (err) return res.status(500).send('Error al eliminar relaciones de géneros');
+        // Ahora elimina el producto
+        db.query('DELETE FROM producto WHERE Id=?', [id], (err2, result) => {
+            if (err2) return res.status(500).send('Error al eliminar producto');
+            if (result.affectedRows === 0) return res.status(404).send('Producto no encontrado');
+            res.send('Producto eliminado');
+        });
     });
 });
 
