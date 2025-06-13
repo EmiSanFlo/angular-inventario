@@ -68,23 +68,25 @@ app.post('/productos/importar', (req, res) => {
     }
 
     const query = `
-        INSERT INTO producto (Id, Nombre, Precio, StockDisponible, ImagenPrincipal)
-        VALUES ?
-        ON DUPLICATE KEY UPDATE
-            Nombre=VALUES(Nombre),
-            Precio=VALUES(Precio),
-            StockDisponible=VALUES(StockDisponible),
-            ImagenPrincipal=VALUES(ImagenPrincipal)
-    `;
+    INSERT INTO producto (Id, Nombre, Artista, Precio, StockDisponible, ImagenPrincipal)
+    VALUES ?
+    ON DUPLICATE KEY UPDATE
+        Nombre=VALUES(Nombre),
+        Artista=VALUES(Artista),
+        Precio=VALUES(Precio),
+        StockDisponible=VALUES(StockDisponible),
+        ImagenPrincipal=VALUES(ImagenPrincipal)
+`;
 
-    // Prepara los valores (ajusta los nombres según tu modelo)
-    const values = productos.map(p => [
-        p.id,
-        p.nombre,
-        p.precio,
-        p.cantidad,
-        p.imagen // la imagen en base64
-    ]);
+const values = productos.map(p => [
+    p.id,
+    p.nombre,
+    p.artista, // <-- AQUI AÑADES EL ARTISTA
+    p.precio,
+    p.cantidad,
+    p.imagen
+]);
+
 
     db.query(query, [values], (err, result) => {
         if (err) {
@@ -503,6 +505,82 @@ app.get('/historial', (req, res) => {
       }
     );
 });
+
+// Obtener el carrito del usuario
+app.get('/carrito/:usuarioId', (req, res) => {
+  const usuarioId = req.params.usuarioId;
+  db.query(
+    `SELECT ci.id, ci.producto_id, ci.cantidad, p.Nombre, p.Precio, p.ImagenPrincipal
+     FROM carrito_item ci
+     JOIN carrito c ON ci.carrito_id = c.id
+     JOIN producto p ON ci.producto_id = p.Id
+     WHERE c.usuario_id = ?`, [usuarioId],
+    (err, results) => {
+      if (err) return res.status(500).send('Error al obtener carrito');
+      res.json(results);
+    }
+  );
+});
+
+// Agregar o actualizar producto en el carrito
+app.post('/carrito/:usuarioId', (req, res) => {
+  const usuarioId = req.params.usuarioId;
+  const { productoId, cantidad } = req.body;
+
+  console.log('POST /carrito → usuarioId:', usuarioId, 'productoId:', productoId, 'cantidad:', cantidad); // <---- AGREGA ESTO
+  // 1️⃣ Verificar si el usuario ya tiene un carrito
+  db.query('SELECT id FROM carrito WHERE usuario_id = ?', [usuarioId], (err, resultCarrito) => {
+    if (err) return res.status(500).send('Error al obtener carrito');
+    
+    let carritoId;
+    if (resultCarrito.length === 0) {
+      // Si no hay carrito, lo creo
+      db.query('INSERT INTO carrito (usuario_id) VALUES (?)', [usuarioId], (err2, insertResult) => {
+        if (err2) return res.status(500).send('Error al crear carrito');
+        carritoId = insertResult.insertId;
+        insertarOActualizarItem(carritoId);
+      });
+    } else {
+      carritoId = resultCarrito[0].id;
+      insertarOActualizarItem(carritoId);
+    }
+
+    // 2️⃣ Insertar o actualizar item
+    function insertarOActualizarItem(carritoId) {
+      db.query(
+        'SELECT id, cantidad FROM carrito_item WHERE carrito_id = ? AND producto_id = ?',
+        [carritoId, productoId],
+        (err3, resultItem) => {
+          if (err3) return res.status(500).send('Error al obtener item del carrito');
+          
+          if (resultItem.length === 0) {
+            // Insertar nuevo item
+            db.query(
+              'INSERT INTO carrito_item (carrito_id, producto_id, cantidad) VALUES (?, ?, ?)',
+              [carritoId, productoId, cantidad],
+              (err4) => {
+                if (err4) return res.status(500).send('Error al agregar item al carrito');
+                res.send('Producto agregado al carrito');
+              }
+            );
+          } else {
+            // Actualizar cantidad
+            const nuevaCantidad = resultItem[0].cantidad + cantidad;
+            db.query(
+              'UPDATE carrito_item SET cantidad = ? WHERE id = ?',
+              [nuevaCantidad, resultItem[0].id],
+              (err5) => {
+                if (err5) return res.status(500).send('Error al actualizar cantidad del carrito');
+                res.send('Cantidad del producto actualizada en el carrito');
+              }
+            );
+          }
+        }
+      );
+    }
+  });
+});
+
 
 // Iniciar el servidor
 const PORT = 3000;

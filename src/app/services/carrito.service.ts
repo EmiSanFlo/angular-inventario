@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Producto } from "../models/producto";
+import { HttpClient } from "@angular/common/http";
 
 interface ItemCarrito {
   producto: Producto;
@@ -76,5 +77,14 @@ export class CarritoService {
 
   calcularSubtotal(): number {
     return this.carrito.reduce((total, item) => total + (item.producto.Precio * item.cantidadEnCarrito), 0);
+  }
+
+  constructor(private http: HttpClient) {}
+
+  agregarProductoBackend(usuarioId: number, productoId: number, cantidad: number) {
+    return this.http.post(`http://localhost:3000/carrito/${usuarioId}`, {
+      productoId,
+      cantidad
+    });
   }
 }

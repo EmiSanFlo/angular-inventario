@@ -31,7 +31,9 @@ export class ProductoService {
         Id: +productoXML.getElementsByTagName('id')[0].textContent!,
         Nombre: productoXML.getElementsByTagName('nombre')[0].textContent!,
         Artista: productoXML.getElementsByTagName('artista')[0].textContent!,
-        Generos: Array.from(productoXML.getElementsByTagName('genero')).map(genero => ({ nombre: genero.textContent! })),
+        Generos: Array.from(productoXML.getElementsByTagName('generoId')).map(genero => ({
+    id: Number(genero.textContent),
+    nombre: ''})), // Asumiendo que generoId es un número
         StockDisponible: +productoXML.getElementsByTagName('cantidad')[0].textContent!,
         Precio: +productoXML.getElementsByTagName('precio')[0].textContent!,
         ImagenPrincipal: productoXML.getElementsByTagName('imagen')[0].textContent!,
@@ -61,25 +63,55 @@ export class ProductoService {
   eliminarProducto(id: number): void {
     this.productos = this.productos.filter((p) => p.Id !== id);
     this.productosSubject.next([...this.productos]); // Notificar el cambio
-  }
+  } 
 
-  generarXML(): string {
+  private escapeXml(unsafe: string): string {
+    return unsafe.replace(/[<>&'"]/g, function (c) {
+        switch (c) {
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '&': return '&amp;';
+            case '\'': return '&apos;';
+            case '"': return '&quot;';
+            default: return c;
+        }
+    });
+}
+
+generarXML(): string {
     let xmlContent = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xmlContent += '<inventario>\n';
-  
+
     this.productos.forEach((producto) => {
-      xmlContent += '  <producto>\n';
-      xmlContent += `    <id>${producto.Id}</id>\n`;
-      xmlContent += `    <nombre>${producto.Nombre}</nombre>\n`;
-      xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
-      xmlContent += `    <precio>${producto.Precio}</precio>\n`;
-      xmlContent += `    <imagen>${producto.ImagenPrincipal}</imagen>\n`;
-      xmlContent += '  </producto>\n';
+        xmlContent += '  <producto>\n';
+        xmlContent += `    <id>${producto.Id}</id>\n`;
+        xmlContent += `    <nombre>${this.escapeXml(producto.Nombre)}</nombre>\n`;
+        xmlContent += `    <artista>${this.escapeXml(producto.Artista || 'Desconocido')}</artista>\n`;
+        xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
+        xmlContent += `    <precio>${producto.Precio}</precio>\n`;
+
+        xmlContent += '    <generos>\n';
+        (producto.Generos || []).forEach(genero => {
+            xmlContent += '      <genero>\n';
+            xmlContent += `        <id>${genero.id}</id>\n`;
+            xmlContent += `        <nombre>${this.escapeXml(genero.nombre)}</nombre>\n`;
+            xmlContent += '      </genero>\n';
+        });
+        xmlContent += '    </generos>\n';
+
+        // Imagen en CDATA
+        xmlContent += '    <imagen>\n';
+        xmlContent += `      <![CDATA[${producto.ImagenPrincipal || ''}]]>\n`;
+        xmlContent += '    </imagen>\n';
+
+        xmlContent += '  </producto>\n';
     });
-  
+
     xmlContent += '</inventario>';
     return xmlContent;
-  }
+}
+
+
 
   buscarProductos(nombre: string, artista: string, genero: string): Observable<Producto[]> {
     let params: any = {};

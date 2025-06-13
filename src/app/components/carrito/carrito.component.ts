@@ -109,6 +109,16 @@ script.src = 'https://www.paypal.com/sdk/js?client-id=AeKqkTVpxSw01eWL5FTML5F3WL
   
     agregarOtro(index: number) {
   const item = this.carrito[index];
-  this.carritoService.agregarProducto(item.producto);
+
+  // Aquí pon el ID del usuario logueado (ejemplo de localStorage o de tu servicio de Auth)
+  const USUARIO_ID = Number(localStorage.getItem('usuarioId'));
+
+  this.carritoService.agregarProductoBackend(USUARIO_ID, item.producto.Id, 1).subscribe({
+    next: () => {
+      console.log('Producto guardado en el backend');
+      this.carritoService.agregarProducto(item.producto); // también actualizo local si quiero
+    },
+    error: err => console.error('Error al guardar en backend:', err)
+  });
 }
 }

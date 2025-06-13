@@ -3,7 +3,7 @@ export class Producto{
         public Id : number,
         public Nombre : string,
         public Artista : string,
-        public Generos: { nombre: string }[],
+        public Generos: { id: number, nombre: string }[],
         public StockDisponible : number,
         public Precio : number,
         public ImagenPrincipal : string

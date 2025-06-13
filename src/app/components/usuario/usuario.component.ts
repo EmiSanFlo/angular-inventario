@@ -43,6 +43,8 @@ export class UsuarioComponent {
     if (res.ok) {
       const data = await res.json();
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      localStorage.setItem('usuarioId', data.usuario.id); // <--- ESTA LÍNEA ES LA QUE FALTA
+
       // Recarga la página para que AppComponent detecte la sesión
       window.location.href = '/producto';
     } else {

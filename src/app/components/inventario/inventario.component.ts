@@ -152,9 +152,16 @@ console.log('Enviando al backend:', productoModificado);
       xmlContent += `    <id>${producto.Id}</id>\n`;
       xmlContent += `    <nombre>${producto.Nombre}</nombre>\n`;
       xmlContent += `    <artista>${producto.Artista || 'Desconocido'}</artista>\n`; // Asignar un valor por defecto si no existe
+      // Agregar géneros
+xmlContent += '    <generos>\n';
+(producto.Generos || []).forEach((genero) => {
+  xmlContent += `      <generoId>${genero.id}</generoId>\n`;
+});
+xmlContent += '    </generos>\n';
+
       xmlContent += `    <cantidad>${producto.StockDisponible}</cantidad>\n`;
       xmlContent += `    <precio>${producto.Precio}</precio>\n`;
-      xmlContent += `    <imagen>${producto.ImagenPrincipal}</imagen>\n`;
+      xmlContent += `    <imagen>${producto.ImagenPrincipal ? 'SI' : 'NO'}</imagen>\n`;
       xmlContent += '  </producto>\n';
     });
 
